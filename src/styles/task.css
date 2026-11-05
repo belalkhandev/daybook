@@ -1,0 +1,338 @@
+.task-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 18px;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 11px;
+  background: rgba(22, 22, 29, 0.05);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.timer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 0 4px 0 14px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+}
+
+.timer-pill button {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.mark-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 11px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sel-pill {
+  min-height: 36px;
+  padding: 0 30px 0 28px;
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.sel-dot {
+  position: absolute;
+  left: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sel-dot.sq-lg {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+}
+
+.task-title-input {
+  width: 100%;
+  max-width: 900px;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 48px;
+  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+
+.prop-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.prop-btn .k {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.pop-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px;
+}
+
+.task-editor {
+  display: flex;
+  flex-direction: column;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.75);
+  -webkit-backdrop-filter: blur(24px) saturate(165%);
+  backdrop-filter: blur(24px) saturate(165%);
+  overflow: hidden;
+}
+
+.reduce-glass .task-editor {
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.te-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(22, 22, 29, 0.07);
+}
+
+.improve-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  margin-right: 6px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 9px;
+  background: var(--accent-tint);
+  color: var(--accent-ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.improve-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.te-tool {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-3);
+}
+
+.te-write {
+  min-height: 360px;
+  padding: 28px 36px;
+  border: none;
+  outline: none;
+  resize: vertical;
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--text-2);
+}
+
+.te-preview {
+  padding: 30px 36px 34px;
+  min-height: 200px;
+}
+
+.te-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 14px;
+  border-top: 1px solid rgba(22, 22, 29, 0.07);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.side-box {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 22px;
+  border-radius: 22px;
+}
+
+.bar-track {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(22, 22, 29, 0.08);
+  overflow: hidden;
+}
+
+.reset-btn {
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 9px;
+  border: 1px solid rgba(22, 22, 29, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--text-3);
+  font-size: 12px;
+}
+
+.avatar {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.bubble {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px;
+  border-radius: 4px 16px 16px 16px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(22, 22, 29, 0.06);
+}
+
+.bubble-actions {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.bubble:hover .bubble-actions,
+.bubble:focus-within .bubble-actions {
+  opacity: 1;
+}
+
+.bubble-actions button {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.comment-edit {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(22, 22, 29, 0.1);
+  outline: none;
+  resize: none;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.composer {
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  border: 1px solid rgba(22, 22, 29, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.composer textarea {
+  padding: 14px 16px 6px;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.send-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}

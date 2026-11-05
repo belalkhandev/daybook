@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daybook — Task window</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FFFFFF}
+a{color:#4338CA}a:hover{color:#312E81}
+input::placeholder,textarea::placeholder{color:#6B6B7B}
+</style>
+</helmet>
+<div style="position: relative; min-height: 100vh; overflow: hidden; background: #FFFFFF; font-family: 'Geist', ui-sans-serif, system-ui, sans-serif; color: #16161D; -webkit-font-smoothing: antialiased">
+<div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; z-index: 0">
+<div style="position: absolute; top: -260px; left: 20%; width: 900px; height: 520px; border-radius: 50%; background: radial-gradient(closest-side, rgba(167,139,250,0.30), rgba(167,139,250,0))"></div>
+<div style="position: absolute; top: 18%; right: -200px; width: 640px; height: 640px; border-radius: 50%; background: radial-gradient(closest-side, rgba(253,186,116,0.24), rgba(253,186,116,0))"></div>
+<div style="position: absolute; top: 48%; left: -8%; width: 1100px; height: 300px; border-radius: 50%; transform: rotate(-8deg); background: linear-gradient(90deg, rgba(110,231,183,0), rgba(110,231,183,0.20), rgba(147,197,253,0.24), rgba(147,197,253,0)); filter: blur(32px)"></div>
+<div style="position: absolute; bottom: -200px; right: 20%; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(closest-side, rgba(244,114,182,0.14), rgba(244,114,182,0))"></div>
+</div>
+<div style="position: relative; z-index: 1; max-width: 1360px; margin: 0 auto; padding: 20px 32px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px; border-radius: 18px; background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); border: 1px solid rgba(255,255,255,0.9)">
+<div style="display: flex; align-items: center; gap: 10px">
+<a href="Main.dc.html" style="display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 12px; border-radius: 11px; background: rgba(22,22,29,0.05); color: #16161D; font-size: 13px; font-weight: 500; text-decoration: none"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Today</a>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #5A5A6B">TASK-142</span>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<div style="display: inline-flex; align-items: center; gap: 10px; min-height: 38px; padding: 0 4px 0 14px; border-radius: 999px; background: #16161D; color: #FFFFFF">
+<span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: {{barColor}}"></span>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px">{{elapsed}}</span>
+<button type="button" aria-label="{{timerLabel}}" onClick="{{toggleTimer}}" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 50%; background: rgba(255,255,255,0.14); color: #FFFFFF; cursor: pointer">
+<sc-if value="{{running}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" style="fill: currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg></sc-if>
+<sc-if value="{{paused}}" hint-placeholder-val="{{true}}"><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" style="fill: currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10-6.5a1 1 0 0 0 0-1.7l-10-6.5A1 1 0 0 0 8 5.5z"></path></svg></sc-if>
+</button>
+</div>
+<button type="button" onClick="{{toggleDone}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 14px; border: none; border-radius: 11px; background: {{accent}}; color: #FFFFFF; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>{{doneBtnLabel}}</button>
+<div aria-hidden="true" style="width: 1px; height: 22px; margin: 0 4px; background: rgba(22,22,29,0.1)"></div>
+<button type="button" aria-label="Minimize window" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 50%; background: rgba(22,22,29,0.06); color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M7 12h10"></path></svg></button>
+<button type="button" aria-label="Maximize window" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 50%; background: rgba(22,22,29,0.06); color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2"><rect x="7" y="7" width="10" height="10" rx="1.5"></rect></svg></button>
+<button type="button" aria-label="Close window" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 50%; background: rgba(22,22,29,0.06); color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M8 8l8 8M16 8l-8 8"></path></svg></button>
+</div>
+</header>
+
+<section aria-labelledby="task-title" style="display: flex; flex-direction: column; gap: 18px; padding: 0 4px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<div style="position: relative; display: flex; align-items: center">
+<span aria-hidden="true" style="position: absolute; left: 12px; width: 9px; height: 9px; border-radius: 3px; background: {{projectColor}}; pointer-events: none"></span>
+<label for="tw-project" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Project</label>
+<select id="tw-project" value="{{project}}" onChange="{{onProject}}" style="display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.9); background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #16161D; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; padding: 0 30px 0 28px; appearance: none; -webkit-appearance: none">
+<option value="Daybook App">Daybook App</option>
+<option value="Client work">Client work</option>
+<option value="Website">Website</option>
+<option value="Personal">Personal</option>
+</select>
+<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" style="position: absolute; right: 10px; color: #5A5A6B; pointer-events: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M6 9l6 6 6-6"></path></svg>
+</div>
+<div style="position: relative; display: flex; align-items: center">
+<span aria-hidden="true" style="position: absolute; left: 12px; width: 8px; height: 8px; border-radius: 50%; background: {{statusDot}}; pointer-events: none"></span>
+<label for="tw-status" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Status</label>
+<select id="tw-status" value="{{taskStatus}}" onChange="{{onStatus}}" style="display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.9); background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #16161D; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; padding: 0 30px 0 28px; appearance: none; -webkit-appearance: none">
+<option value="todo">To do</option>
+<option value="progress">In progress</option>
+<option value="done">Done</option>
+</select>
+<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" style="position: absolute; right: 10px; color: #5A5A6B; pointer-events: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M6 9l6 6 6-6"></path></svg>
+</div>
+</div>
+<h1 id="task-title" style="margin: 0; max-width: 900px; font-size: 48px; line-height: 1.05; font-weight: 600; letter-spacing: -0.04em; {{titleStyle}}">Write release notes for v0.4</h1>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<button type="button" style="display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.9); background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #16161D; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5A5A6B">Priority</span><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #EA580C"></span><span style="color: #B4410B; font-weight: 600">High</span></button>
+<button type="button" style="display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.9); background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #16161D; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5A5A6B">Due</span>Today · 18:00</button>
+<button type="button" style="display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.9); background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #16161D; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5A5A6B">Target</span>2h 00m</button>
+<button type="button" style="display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.9); background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); color: #16161D; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5A5A6B">Tags</span>#dev #release</button>
+<button type="button" style="display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1.5px dashed rgba(22,22,29,0.18); background: transparent; color: #4A4A58; font-family: inherit; font-size: 13px; cursor: pointer"><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M12 5v14M5 12h14"></path></svg>Property</button>
+</div>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px">
+<div style="flex: 999 1 660px; min-width: 0">
+<div style="display: flex; flex-direction: column; border-radius: 24px; border: 1px solid rgba(255,255,255,0.9); background: rgba(255,255,255,{{glassStrong}}); backdrop-filter: blur(24px) saturate(165%); -webkit-backdrop-filter: blur(24px) saturate(165%); overflow: hidden">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-bottom: 1px solid rgba(22,22,29,0.07)">
+<div role="group" aria-label="Editor mode" style="display: flex; gap: 2px; padding: 3px; border-radius: 10px; background: rgba(22,22,29,0.05)">
+<sc-for list="{{tabs}}" as="tb" hint-placeholder-count="2">
+<button type="button" aria-pressed="{{tb.pressed}}" onClick="{{tb.pick}}" style="min-height: 32px; padding: 0 12px; border: none; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; {{tb.style}}">{{tb.label}}</button>
+</sc-for>
+</div>
+<div role="toolbar" aria-label="Markdown formatting" style="display: flex; flex-wrap: wrap; gap: 2px">
+<button type="button" style="display: inline-flex; align-items: center; gap: 6px; min-height: 34px; margin-right: 6px; padding: 0 12px; border: none; border-radius: 9px; background: rgba(79,70,229,0.10); color: #4338CA; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round"><path d="M12 3l1.8 4.7 4.7 1.8-4.7 1.8L12 16l-1.8-4.7-4.7-1.8 4.7-1.8z"></path><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"></path></svg>Improve with AI</button>
+<button type="button" aria-label="Heading" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: #3A3A48; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer">H</button>
+<button type="button" aria-label="Bold" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round"><path d="M7 5h6a3.5 3.5 0 0 1 0 7H7zM7 12h7a3.5 3.5 0 0 1 0 7H7z"></path></svg></button>
+<button type="button" aria-label="Italic" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M10 5h8M6 19h8M14 5l-4 14"></path></svg></button>
+<button type="button" aria-label="Inline code" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5"></path></svg></button>
+<button type="button" aria-label="Code block" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><rect x="3" y="4" width="18" height="16" rx="3"></rect><path d="M8 10l-2 2 2 2M16 10l2 2-2 2M13 9l-2 6"></path></svg></button>
+<button type="button" aria-label="Bulleted list" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"></path></svg></button>
+<button type="button" aria-label="Checklist" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M4 7l2 2 3-3M4 16l2 2 3-3M13 8h7M13 17h7"></path></svg></button>
+<button type="button" aria-label="Insert link" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path></svg></button>
+</div>
+</div>
+
+<sc-if value="{{isWrite}}" hint-placeholder-val="{{false}}">
+<div style="padding: 28px 36px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13.5px; line-height: 1.75; color: #2A2A35; overflow-x: auto">
+<div><span style="color: {{accent}}">##</span> What’s new in v0.4</div>
+<div style="height: 1.75em"></div>
+<div><span style="color: #6B6B7B">-</span> Offline-first sync with a local <span style="color: #6B6B7B">**</span>SQLite<span style="color: #6B6B7B">**</span> store</div>
+<div><span style="color: #6B6B7B">-</span> Keyboard-only mode — open anything with <span style="color: #B4410B">`Ctrl K`</span></div>
+<div><span style="color: #6B6B7B">-</span> The week strip now scrolls back to past weeks</div>
+<div style="height: 1.75em"></div>
+<div><span style="color: #6B6B7B">- [x]</span> Credit contributors</div>
+<div><span style="color: #6B6B7B">- [ ]</span> Mention the Flatpak release</div>
+<div style="height: 1.75em"></div>
+<div style="color: #6B6B7B">```rust</div>
+<div>use std::{fs, path::Path};</div>
+<div style="height: 1.75em"></div>
+<div>pub fn bump_version(manifest: &amp;Path, next: &amp;str) -&gt; std::io::Result&lt;()&gt; {</div>
+<div style="padding-left: 4ch">let text = fs::read_to_string(manifest)?;</div>
+<div style="padding-left: 4ch">let updated = text.replacen("0.3.2", next, 1);</div>
+<div style="padding-left: 4ch">fs::write(manifest, updated)?;</div>
+<div style="padding-left: 4ch">Ok(())</div>
+<div>}</div>
+<div style="color: #6B6B7B">```</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isPreview}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 16px; padding: 30px 36px 34px">
+<h2 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em">What’s new in v0.4</h2>
+<ul style="margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.6; color: #2A2A35">
+<li>Offline-first sync with a local <strong>SQLite</strong> store</li>
+<li>Keyboard-only mode — open anything with <code style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; padding: 2px 6px; border-radius: 6px; background: rgba(22,22,29,0.06); color: #B4410B">Ctrl K</code></li>
+<li>The week strip now scrolls back to past weeks</li>
+</ul>
+<div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px; color: #2A2A35">
+<div style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 5px; background: {{accent}}"><svg viewBox="0 0 24 24" width="12" height="12" style="fill: none; stroke: #FFFFFF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span><span style="color: #6B6B7B; text-decoration: line-through">Credit contributors</span></div>
+<div style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 18px; height: 18px; box-sizing: border-box; border-radius: 5px; border: 1.5px solid rgba(22,22,29,0.26); background: #FFFFFF"></span><span>Mention the Flatpak release</span></div>
+</div>
+
+<figure style="margin: 4px 0 0; border-radius: 16px; overflow: hidden; background: #17171F">
+<figcaption style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 8px 8px 16px; border-bottom: 1px solid rgba(255,255,255,0.08)">
+<span style="display: inline-flex; align-items: center; gap: 10px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #C9C9D6"><span style="padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.08); color: #E6E6EE">rust</span>bump_version.rs</span>
+<button type="button" onClick="{{copy}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 10px; border: none; border-radius: 8px; background: rgba(255,255,255,0.08); color: #E6E6EE; font-family: inherit; font-size: 12px; cursor: pointer"><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"></path></svg>{{copyLabel}}</button>
+</figcaption>
+<div style="display: flex; overflow-x: auto; padding: 14px 0 16px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.75">
+<div aria-hidden="true" style="flex: none; padding: 0 14px 0 16px; text-align: right; color: #6E6E82; user-select: none">
+<div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div>
+</div>
+<code style="display: block; padding-right: 20px; font: inherit; color: #E6E6EE; white-space: nowrap">
+<div><span style="color: #C4B5FD">use</span> std::{fs, path::<span style="color: #7DD3FC">Path</span>};</div>
+<div style="height: 1.75em"></div>
+<div><span style="color: #C4B5FD">pub fn</span> <span style="color: #86EFAC">bump_version</span>(manifest: &amp;<span style="color: #7DD3FC">Path</span>, next: &amp;<span style="color: #7DD3FC">str</span>) -&gt; std::io::<span style="color: #7DD3FC">Result</span>&lt;()&gt; {</div>
+<div style="padding-left: 4ch"><span style="color: #C4B5FD">let</span> text = fs::<span style="color: #86EFAC">read_to_string</span>(manifest)?;</div>
+<div style="padding-left: 4ch"><span style="color: #C4B5FD">let</span> updated = text.<span style="color: #86EFAC">replacen</span>(<span style="color: #FDBA74">"0.3.2"</span>, next, <span style="color: #F9A8D4">1</span>);</div>
+<div style="padding-left: 4ch">fs::<span style="color: #86EFAC">write</span>(manifest, updated)?;</div>
+<div style="padding-left: 4ch"><span style="color: #7DD3FC">Ok</span>(())</div>
+<div>}</div>
+</code>
+</div>
+</figure>
+</div>
+</sc-if>
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 14px; border-top: 1px solid rgba(22,22,29,0.07); font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5A5A6B">
+<span style="display: inline-flex; align-items: center; gap: 6px"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round"><rect x="2.5" y="6" width="19" height="12" rx="2"></rect><path d="M6 15V9l2.5 3L11 9v6M15.5 9v6M13.5 13l2 2 2-2" style="stroke-linecap: round"></path></svg>Markdown supported</span>
+<span>142 words</span>
+</div>
+</div>
+</div>
+
+<aside style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<section aria-labelledby="target-h" style="display: flex; flex-direction: column; gap: 12px; padding: 20px 22px; border-radius: 22px; background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); border: 1px solid rgba(255,255,255,0.9)">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px">
+<h2 id="target-h" style="margin: 0; font-size: 15px; font-weight: 600">Time target</h2>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #5A5A6B">{{pct}} of 2h</span>
+</div>
+<div aria-hidden="true" style="position: relative; height: 8px; border-radius: 999px; background: rgba(22,22,29,0.08); overflow: hidden">
+<div style="position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; transition: width 0.4s ease; background: {{barColor}}; width: {{pct}}"></div>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 10px">
+<span style="font-size: 13px; color: #4A4A58">{{remainingText}}</span>
+<button type="button" onClick="{{resetTimer}}" style="min-height: 32px; padding: 0 10px; border-radius: 9px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.8); color: #3A3A48; font-family: inherit; font-size: 12px; cursor: pointer">Reset</button>
+</div>
+</section>
+
+<section aria-labelledby="comments-h" style="display: flex; flex-direction: column; gap: 16px; padding: 22px; border-radius: 22px; background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); border: 1px solid rgba(255,255,255,0.9)">
+<div style="display: flex; align-items: center; gap: 10px">
+<h2 id="comments-h" style="margin: 0; font-size: 15px; font-weight: 600">Comments</h2>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; padding: 3px 8px; border-radius: 999px; background: rgba(22,22,29,0.06); color: #4A4A58">{{commentCount}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 16px">
+<sc-for list="{{comments}}" as="c" hint-placeholder-count="2">
+<div style="display: flex; gap: 12px">
+<div aria-hidden="true" style="flex: none; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient(135deg, {{accent}}, #A78BFA); color: #FFFFFF; font-size: 13px; font-weight: 600">Y</div>
+<div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 12px 16px; border-radius: 4px 16px 16px 16px; background: rgba(255,255,255,0.7); border: 1px solid rgba(22,22,29,0.06)">
+<div style="display: flex; align-items: center; gap: 10px"><span style="font-size: 13px; font-weight: 600">{{c.who}}</span><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5A5A6B">{{c.time}}</span></div>
+<p style="margin: 0; font-size: 14px; line-height: 1.6; color: #2A2A35"><sc-for list="{{c.parts}}" as="p" hint-placeholder-count="1"><sc-if value="{{p.plain}}" hint-placeholder-val="{{true}}"><span>{{p.text}}</span></sc-if><sc-if value="{{p.bold}}" hint-placeholder-val="{{false}}"><strong>{{p.text}}</strong></sc-if><sc-if value="{{p.code}}" hint-placeholder-val="{{false}}"><code style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12.5px; padding: 1px 6px; border-radius: 6px; background: rgba(22,22,29,0.06); color: #B4410B">{{p.text}}</code></sc-if></sc-for></p>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; border-radius: 16px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.8)">
+<label for="comment-box" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Write a comment</label>
+<textarea id="comment-box" rows="3" value="{{draft}}" onChange="{{onDraft}}" placeholder="Write a comment… **bold**, `code` and lists work" style="padding: 14px 16px 6px; border: none; outline: none; resize: none; background: transparent; font-family: inherit; font-size: 14px; line-height: 1.6; color: #16161D"></textarea>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 8px 8px 16px">
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5A5A6B">Markdown · Ctrl ↵ to send</span>
+<button type="button" onClick="{{send}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border: none; border-radius: 10px; background: #16161D; color: #FFFFFF; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer">Comment<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+</div>
+</div>
+</section>
+</aside>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#4F46E5","options":["#4F46E5","#0F766E","#C2410C","#16161D"]},"glass":{"editor":"range","default":0.55,"min":0.3,"max":0.9,"step":0.05},"$preview":{"width":1440,"height":1380}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    this.tick = setInterval(() => {
+      const s = this.state || {};
+      if (s.running) this.setState({ secs: (s.secs ?? 5100) + 1 });
+    }, 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.tick);
+  }
+  renderVals() {
+    const st = this.state || {};
+    const accent = this.props.accent ?? '#4F46E5';
+    const glass = this.props.glass ?? 0.55;
+    const tab = st.tab || 'preview';
+    const status = st.status || 'progress';
+    const project = st.project || 'Daybook App';
+    const running = !!st.running;
+    const secs = st.secs ?? 5100;
+    const target = 7200;
+    const draft = st.draft ?? '';
+    const comments = st.comments || [
+      { id: 'c1', who: 'You', time: 'Today · 10:12', text: 'Draft is in `docs/release/v0.4.md`. Still need **screenshots** for the notes page.' },
+      { id: 'c2', who: 'You', time: 'Today · 12:40', text: 'Flatpak build passed on **Fedora** and **Ubuntu**. Run `cargo test --release` once more before tagging.' }
+    ];
+    const projectColors = { 'Daybook App': '#6366F1', 'Client work': '#F59E0B', 'Website': '#EC4899', 'Personal': '#10B981' };
+    const pad = (n) => String(n).padStart(2, '0');
+    const fmt = (s) => Math.floor(s / 3600) + 'h ' + pad(Math.floor((s % 3600) / 60)) + 'm ' + pad(s % 60) + 's';
+    const left = target - secs;
+    const parse = (text) => text.split(/(`[^`]+`|\*\*[^*]+\*\*)/).filter(Boolean).map((p) => {
+      if (p.startsWith('`') && p.endsWith('`')) return { code: true, text: p.slice(1, -1) };
+      if (p.startsWith('**') && p.endsWith('**')) return { bold: true, text: p.slice(2, -2) };
+      return { plain: true, text: p };
+    });
+    const seg = (on) => on
+      ? 'background: #FFFFFF; color: #16161D; box-shadow: 0 1px 3px rgba(22,22,29,0.1)'
+      : 'background: transparent; color: #4A4A58';
+    const isDone = status === 'done';
+    return {
+      accent,
+      glass,
+      glassStrong: Math.min(0.95, glass + 0.2).toFixed(2),
+      taskStatus: status,
+      onStatus: (e) => this.setState({ status: e.target.value }),
+      statusDot: status === 'done' ? '#10B981' : status === 'progress' ? '#F59E0B' : '#9CA3AF',
+      doneBtnLabel: isDone ? 'Reopen' : 'Mark done',
+      project,
+      projectColor: projectColors[project] || accent,
+      onProject: (e) => this.setState({ project: e.target.value }),
+      isDone,
+      doneLabel: isDone ? 'Mark task as not done' : 'Mark task as done',
+      toggleDone: () => this.setState({ status: isDone ? 'progress' : 'done', running: false }),
+      doneBox: isDone ? 'background: ' + accent + '; border-color: ' + accent : 'background: rgba(255,255,255,0.9); border-color: rgba(22,22,29,0.26)',
+      titleStyle: isDone ? 'text-decoration: line-through; color: #6B6B7B' : 'text-decoration: none; color: #16161D',
+      isWrite: tab === 'write',
+      isPreview: tab === 'preview',
+      tabs: [
+        { key: 'write', label: 'Write' },
+        { key: 'preview', label: 'Preview' }
+      ].map((t) => ({ ...t, style: seg(tab === t.key), pressed: tab === t.key ? 'true' : 'false', pick: () => this.setState({ tab: t.key }) })),
+      statuses: [
+        { key: 'todo', label: 'To do' },
+        { key: 'progress', label: 'In progress' },
+        { key: 'done', label: 'Done' }
+      ].map((s) => ({ ...s, style: seg(status === s.key), pressed: status === s.key ? 'true' : 'false', pick: () => this.setState({ status: s.key }) })),
+      copyLabel: st.copied ? 'Copied' : 'Copy',
+      copy: () => {
+        this.setState({ copied: true });
+        setTimeout(() => this.setState({ copied: false }), 1500);
+      },
+      comments: comments.map((c) => ({ ...c, parts: parse(c.text) })),
+      commentCount: comments.length,
+      draft,
+      onDraft: (e) => this.setState({ draft: e.target.value }),
+      send: () => {
+        const text = draft.trim();
+        if (!text) return;
+        this.setState({ comments: [...comments, { id: 'c' + Date.now(), who: 'You', time: 'Just now', text }], draft: '' });
+      },
+      elapsed: fmt(secs),
+      remainingText: left > 0 ? fmt(left) + ' left of your 2h target' : fmt(-left) + ' over target',
+      pct: Math.min(100, Math.round((secs / target) * 100)) + '%',
+      barColor: left > 0 ? accent : '#EA580C',
+      running,
+      paused: !running,
+      timerLabel: running ? 'Pause' : 'Start focus',
+      toggleTimer: () => this.setState({ running: !running }),
+      resetTimer: () => this.setState({ running: false, secs: 0 })
+    };
+  }
+}
+</script>
+</body>
+</html>

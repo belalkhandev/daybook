@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daybook — Write with AI</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FFFFFF}
+a{color:#4338CA}a:hover{color:#312E81}
+input::placeholder,textarea::placeholder{color:#6B6B7B}
+@keyframes dbShimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+@keyframes dbPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.88)}}
+</style>
+</helmet>
+<div style="position: relative; min-height: 100vh; overflow: hidden; background: #FFFFFF; font-family: 'Geist', ui-sans-serif, system-ui, sans-serif; color: #16161D; -webkit-font-smoothing: antialiased">
+<div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; z-index: 0">
+<div style="position: absolute; top: -220px; left: -160px; width: 680px; height: 680px; border-radius: 50%; background: radial-gradient(closest-side, rgba(167,139,250,0.34), rgba(167,139,250,0))"></div>
+<div style="position: absolute; top: -160px; right: -120px; width: 640px; height: 640px; border-radius: 50%; background: radial-gradient(closest-side, rgba(253,186,116,0.28), rgba(253,186,116,0))"></div>
+<div style="position: absolute; top: 40%; left: 20%; width: 960px; height: 300px; border-radius: 50%; transform: rotate(-12deg); background: linear-gradient(90deg, rgba(147,197,253,0), rgba(147,197,253,0.26), rgba(196,181,253,0.24), rgba(196,181,253,0)); filter: blur(30px)"></div>
+<div style="position: absolute; bottom: -220px; left: 6%; width: 580px; height: 580px; border-radius: 50%; background: radial-gradient(closest-side, rgba(110,231,183,0.22), rgba(110,231,183,0))"></div>
+<div style="position: absolute; top: 20px; left: 32px; right: 32px; height: 58px; border-radius: 20px; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.9)"></div>
+<div style="position: absolute; top: 120px; left: 32px; width: 360px; height: 110px; border-radius: 20px; background: rgba(22,22,29,0.03)"></div>
+<div style="position: absolute; top: 270px; left: 32px; right: 32px; height: 60px; border-radius: 18px; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.9)"></div>
+<div style="position: absolute; top: 360px; left: 32px; width: 62%; height: 620px; border-radius: 24px; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.9)"></div>
+<div style="position: absolute; top: 360px; right: 32px; width: 30%; height: 260px; border-radius: 24px; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.9)"></div>
+<div style="position: absolute; inset: 0; background: rgba(246,245,252,0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px)"></div>
+</div>
+
+<div style="position: relative; z-index: 1; min-height: 100vh; box-sizing: border-box; padding: 72px 20px 48px; display: flex; justify-content: center; align-items: flex-start">
+<section role="dialog" aria-modal="true" aria-labelledby="ai-title" style="width: 100%; max-width: 780px; display: flex; flex-direction: column; border-radius: 28px; background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%); border: 1px solid rgba(255,255,255,0.95)">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 18px 0 24px">
+<div style="display: flex; align-items: center; gap: 12px">
+<div aria-hidden="true" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 11px; background: rgba(79,70,229,0.10); color: {{accent}}">
+<svg viewBox="0 0 24 24" width="18" height="18" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round"><path d="M12 3l1.8 4.7 4.7 1.8-4.7 1.8L12 16l-1.8-4.7-4.7-1.8 4.7-1.8z"></path><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"></path></svg>
+</div>
+<h2 id="ai-title" style="margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.01em">Write with AI</h2>
+<div role="group" aria-label="Item type" style="display: flex; gap: 2px; padding: 3px; border-radius: 11px; background: rgba(22,22,29,0.05)">
+<sc-for list="{{types}}" as="ty" hint-placeholder-count="2">
+<button type="button" aria-pressed="{{ty.pressed}}" onClick="{{ty.pick}}" style="min-height: 32px; padding: 0 12px; border: none; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; {{ty.style}}">{{ty.label}}</button>
+</sc-for>
+</div>
+</div>
+<a href="Main.dc.html" aria-label="Close" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(22,22,29,0.06); color: #3A3A48">
+<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M8 8l8 8M16 8l-8 8"></path></svg>
+</a>
+</div>
+
+<sc-if value="{{isCompose}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 16px; padding: 20px 24px 22px">
+<label for="ai-prompt" style="font-size: 14px; color: #3A3A48">{{promptLabel}}</label>
+<textarea id="ai-prompt" rows="4" value="{{prompt}}" onChange="{{onPrompt}}" placeholder="{{promptPlaceholder}}" style="padding: 16px 18px; border-radius: 16px; border: 1px solid rgba(22,22,29,0.1); outline: none; resize: none; background: rgba(255,255,255,0.8); font-family: inherit; font-size: 16px; line-height: 1.6; color: #16161D"></textarea>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<span style="font-size: 13px; color: #4A4A58">Format</span>
+<div role="group" aria-label="Output format" style="display: flex; gap: 6px">
+<sc-for list="{{formats}}" as="f" hint-placeholder-count="3">
+<button type="button" aria-pressed="{{f.pressed}}" onClick="{{f.pick}}" style="min-height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; {{f.style}}">{{f.label}}</button>
+</sc-for>
+</div>
+</div>
+<button type="button" onClick="{{generate}}" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border: none; border-radius: 13px; background: {{accent}}; color: #FFFFFF; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer">
+<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round"><path d="M12 3l1.8 4.7 4.7 1.8-4.7 1.8L12 16l-1.8-4.7-4.7-1.8 4.7-1.8z"></path><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"></path></svg>
+Generate
+<kbd style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; padding: 1px 6px; border-radius: 5px; background: rgba(255,255,255,0.18); color: #FFFFFF">Ctrl ↵</kbd>
+</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isLoading}}" hint-placeholder-val="{{false}}">
+<div aria-live="polite" style="display: flex; flex-direction: column; gap: 16px; padding: 22px 24px 26px">
+<div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #3A3A48">
+<span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: {{accent}}; animation: dbPulse 1s ease-in-out infinite"></span>
+Writing your {{typeWord}}…
+</div>
+<p style="margin: 0; padding: 12px 14px; border-radius: 12px; background: rgba(22,22,29,0.035); font-size: 13px; line-height: 1.5; color: #5A5A6B">“{{prompt}}”</p>
+<div aria-hidden="true" style="display: flex; flex-direction: column; gap: 12px">
+<div style="height: 26px; width: 58%; border-radius: 8px; background: linear-gradient(90deg, rgba(22,22,29,0.05) 0, rgba(79,70,229,0.14) 50%, rgba(22,22,29,0.05) 100%); background-size: 1200px 100%; animation: dbShimmer 1.3s linear infinite"></div>
+<div style="display: flex; gap: 8px"><div style="height: 30px; width: 120px; border-radius: 999px; background: linear-gradient(90deg, rgba(22,22,29,0.05) 0, rgba(79,70,229,0.14) 50%, rgba(22,22,29,0.05) 100%); background-size: 1200px 100%; animation: dbShimmer 1.3s linear infinite"></div><div style="height: 30px; width: 90px; border-radius: 999px; background: linear-gradient(90deg, rgba(22,22,29,0.05) 0, rgba(79,70,229,0.14) 50%, rgba(22,22,29,0.05) 100%); background-size: 1200px 100%; animation: dbShimmer 1.3s linear infinite"></div><div style="height: 30px; width: 110px; border-radius: 999px; background: linear-gradient(90deg, rgba(22,22,29,0.05) 0, rgba(79,70,229,0.14) 50%, rgba(22,22,29,0.05) 100%); background-size: 1200px 100%; animation: dbShimmer 1.3s linear infinite"></div></div>
+<div style="height: 14px; width: 92%; border-radius: 6px; background: linear-gradient(90deg, rgba(22,22,29,0.05) 0, rgba(79,70,229,0.14) 50%, rgba(22,22,29,0.05) 100%); background-size: 1200px 100%; animation: dbShimmer 1.3s linear infinite"></div>
+<div style="height: 14px; width: 80%; border-radius: 6px; background: linear-gradient(90deg, rgba(22,22,29,0.05) 0, rgba(79,70,229,0.14) 50%, rgba(22,22,29,0.05) 100%); background-size: 1200px 100%; animation: dbShimmer 1.3s linear infinite"></div>
+<div style="height: 14px; width: 66%; border-radius: 6px; background: linear-gradient(90deg, rgba(22,22,29,0.05) 0, rgba(79,70,229,0.14) 50%, rgba(22,22,29,0.05) 100%); background-size: 1200px 100%; animation: dbShimmer 1.3s linear infinite"></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isResult}}" hint-placeholder-val="{{false}}">
+<div aria-live="polite" style="display: flex; flex-direction: column; gap: 16px; padding: 20px 24px 22px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px">
+<span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(79,70,229,0.10); color: #4338CA; font-size: 12px; font-weight: 600">
+<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round"><path d="M12 3l1.8 4.7 4.7 1.8-4.7 1.8L12 16l-1.8-4.7-4.7-1.8 4.7-1.8z"></path></svg>
+AI draft · review before saving
+</span>
+<button type="button" onClick="{{backToPrompt}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 10px; border: none; border-radius: 9px; background: transparent; color: #4A4A58; font-family: inherit; font-size: 13px; cursor: pointer"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg>Edit prompt</button>
+</div>
+<label for="ai-out-title" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Title</label>
+<input id="ai-out-title" type="text" value="{{out.title}}" style="min-height: 44px; padding: 0; border: none; outline: none; background: transparent; font-family: inherit; font-size: 28px; font-weight: 600; letter-spacing: -0.03em; color: #16161D">
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{out.props}}" as="p" hint-placeholder-count="5">
+<button type="button" style="display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(79,70,229,0.22); background: rgba(255,255,255,0.8); color: #16161D; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer"><span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5A5A6B">{{p.label}}</span><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: {{p.dot}}"></span>{{p.value}}</button>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; max-height: 360px; overflow-y: auto; padding: 18px 20px; border-radius: 16px; border: 1px solid rgba(22,22,29,0.08); background: rgba(255,255,255,0.75)">
+<sc-for list="{{out.blocks}}" as="b" hint-placeholder-count="5">
+<sc-if value="{{b.isH}}" hint-placeholder-val="{{false}}"><h3 style="margin: 6px 0 0; font-size: 16px; font-weight: 600">{{b.text}}</h3></sc-if>
+<sc-if value="{{b.isP}}" hint-placeholder-val="{{true}}"><p style="margin: 0; font-size: 15px; line-height: 1.6; color: #2A2A35"><sc-for list="{{b.parts}}" as="t" hint-placeholder-count="1"><sc-if value="{{t.plain}}" hint-placeholder-val="{{true}}"><span>{{t.text}}</span></sc-if><sc-if value="{{t.bold}}" hint-placeholder-val="{{false}}"><strong>{{t.text}}</strong></sc-if><sc-if value="{{t.code}}" hint-placeholder-val="{{false}}"><code style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; padding: 1px 6px; border-radius: 6px; background: rgba(22,22,29,0.06); color: #B4410B">{{t.text}}</code></sc-if></sc-for></p></sc-if>
+<sc-if value="{{b.isLi}}" hint-placeholder-val="{{false}}"><div style="display: flex; gap: 10px; font-size: 15px; line-height: 1.6; color: #2A2A35"><span aria-hidden="true" style="color: #6B6B7B">•</span><span><sc-for list="{{b.parts}}" as="t" hint-placeholder-count="1"><sc-if value="{{t.plain}}" hint-placeholder-val="{{true}}"><span>{{t.text}}</span></sc-if><sc-if value="{{t.bold}}" hint-placeholder-val="{{false}}"><strong>{{t.text}}</strong></sc-if><sc-if value="{{t.code}}" hint-placeholder-val="{{false}}"><code style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; padding: 1px 6px; border-radius: 6px; background: rgba(22,22,29,0.06); color: #B4410B">{{t.text}}</code></sc-if></sc-for></span></div></sc-if>
+<sc-if value="{{b.isCheck}}" hint-placeholder-val="{{false}}"><div style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: #2A2A35"><span aria-hidden="true" style="flex: none; width: 18px; height: 18px; box-sizing: border-box; border-radius: 5px; border: 1.5px solid rgba(22,22,29,0.26); background: #FFFFFF"></span>{{b.text}}</div></sc-if>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px">
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<button type="button" onClick="{{generate}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.8); color: #3A3A48; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"></path></svg>Regenerate</button>
+<sc-for list="{{refines}}" as="r" hint-placeholder-count="3">
+<button type="button" onClick="{{r.pick}}" style="min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.8); color: #3A3A48; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer">{{r.label}}</button>
+</sc-for>
+</div>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5A5A6B">Markdown · editable after saving</span>
+</div>
+</div>
+</sc-if>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px 14px 24px; border-top: 1px solid rgba(22,22,29,0.07); border-radius: 0 0 28px 28px; background: rgba(255,255,255,0.45)">
+<a href="AISettings.dc.html" style="display: inline-flex; align-items: center; gap: 8px; min-height: 32px; font-size: 12px; color: #4A4A58; text-decoration: none"><span aria-hidden="true" style="width: 7px; height: 7px; border-radius: 50%; background: #10B981"></span><span style="font-family: 'Geist Mono', ui-monospace, monospace">OpenAI connected</span><span style="color: #4338CA">· Settings</span></a>
+<div style="display: flex; gap: 8px">
+<a href="QuickAdd.dc.html" style="display: inline-flex; align-items: center; min-height: 42px; padding: 0 16px; border-radius: 12px; color: #3A3A48; font-size: 14px; font-weight: 500; text-decoration: none">Write manually</a>
+<sc-if value="{{isResult}}" hint-placeholder-val="{{false}}">
+<a href="{{saveHref}}" style="display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 18px; border-radius: 12px; background: #16161D; color: #FFFFFF; font-size: 14px; font-weight: 600; text-decoration: none">{{saveLabel}}</a>
+</sc-if>
+</div>
+</div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#4F46E5","options":["#4F46E5","#0F766E","#C2410C","#16161D"]},"glass":{"editor":"range","default":0.72,"min":0.4,"max":0.95,"step":0.05},"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  componentWillUnmount() {
+    clearTimeout(this.job);
+  }
+  renderVals() {
+    const st = this.state || {};
+    const accent = this.props.accent ?? '#4F46E5';
+    const glass = this.props.glass ?? 0.72;
+    const type = st.type || 'task';
+    const format = st.format || 'checklist';
+    const phase = st.phase || 'result';
+    const prompts = st.prompts || {
+      task: 'need to do release notes for 0.4 by this evening, mention sqlite sync, ctrl k mode, flatpak. should take around 2 hours',
+      note: 'design sync today: keep glass cards, blur lower on old gpus, light theme first dark later, week strip should scroll back'
+    };
+    const isTask = type === 'task';
+    const parse = (text) => text.split(/(`[^`]+`|\*\*[^*]+\*\*)/).filter(Boolean).map((p) => {
+      if (p.startsWith('`') && p.endsWith('`')) return { code: true, text: p.slice(1, -1) };
+      if (p.startsWith('**') && p.endsWith('**')) return { bold: true, text: p.slice(2, -2) };
+      return { plain: true, text: p };
+    });
+    const blk = (k, text) => ({ isH: k === 'h', isP: k === 'p', isLi: k === 'li', isCheck: k === 'c', text, parts: parse(text) });
+    const drafts = {
+      task: {
+        title: 'Write release notes for v0.4',
+        props: [
+          { label: 'Project', value: 'Daybook App', dot: '#6366F1' },
+          { label: 'Priority', value: 'High', dot: '#EA580C' },
+          { label: 'Due', value: 'Today · 18:00', dot: '#9CA3AF' },
+          { label: 'Target', value: '2h 00m', dot: '#9CA3AF' },
+          { label: 'Tags', value: '#dev #release', dot: '#9CA3AF' }
+        ],
+        brief: [
+          ['p', 'Draft and publish the **v0.4** release notes before the evening build.'],
+          ['c', 'List the highlights'],
+          ['c', 'Mention the Flatpak release'],
+          ['c', 'Publish to GitHub Releases']
+        ],
+        checklist: [
+          ['p', 'Draft and publish the **v0.4** release notes before the evening build.'],
+          ['h', 'Highlights'],
+          ['li', 'Offline-first sync with a local **SQLite** store'],
+          ['li', 'Keyboard-only mode — open anything with `Ctrl K`'],
+          ['h', 'Steps'],
+          ['c', 'Collect merged pull requests since v0.3.2'],
+          ['c', 'Write highlights and add screenshots'],
+          ['c', 'Mention the Flatpak release'],
+          ['c', 'Publish to GitHub Releases']
+        ],
+        detailed: [
+          ['p', 'Draft and publish the **v0.4** release notes before the evening build. Aim for a short, friendly tone that a new user can scan in under a minute.'],
+          ['h', 'Highlights'],
+          ['li', 'Offline-first sync with a local **SQLite** store — changes are saved even without a network'],
+          ['li', 'Keyboard-only mode — every action is reachable from `Ctrl K`'],
+          ['h', 'Steps'],
+          ['c', 'Collect merged pull requests since v0.3.2'],
+          ['c', 'Write highlights and add screenshots'],
+          ['c', 'Mention the Flatpak release and install command'],
+          ['c', 'Publish to GitHub Releases'],
+          ['h', 'Notes'],
+          ['p', 'Link each highlight to its pull request so contributors get credit.']
+        ]
+      },
+      note: {
+        title: 'Design sync — 29 Oct',
+        props: [
+          { label: 'Folder', value: 'Work', dot: '#FDBA74' },
+          { label: 'Color', value: 'Peach', dot: '#FDBA74' },
+          { label: 'Tags', value: '#design', dot: '#9CA3AF' }
+        ],
+        brief: [
+          ['h', 'Decisions'],
+          ['li', 'Keep the glass cards'],
+          ['li', 'Light theme first, dark theme in **v0.5**'],
+          ['c', 'Make the week strip scroll back']
+        ],
+        checklist: [
+          ['h', 'Decisions'],
+          ['li', 'Keep the glass cards across every screen'],
+          ['li', 'Lower the blur strength on older GPUs'],
+          ['li', 'Ship the light theme first; dark theme in **v0.5**'],
+          ['h', 'Follow-ups'],
+          ['c', 'Make the week strip scroll back to past weeks'],
+          ['c', 'Test blur performance on integrated graphics']
+        ],
+        detailed: [
+          ['h', 'Context'],
+          ['p', 'Weekly design sync on the Today screen and the overall glass look.'],
+          ['h', 'Decisions'],
+          ['li', 'Keep the glass cards across every screen'],
+          ['li', 'Lower the blur strength on older GPUs, with a reduced-transparency switch'],
+          ['li', 'Ship the light theme first; dark theme in **v0.5**'],
+          ['h', 'Follow-ups'],
+          ['c', 'Make the week strip scroll back to past weeks'],
+          ['c', 'Test blur performance on integrated graphics'],
+          ['c', 'Share screenshots in the next sync']
+        ]
+      }
+    };
+    const d = drafts[type];
+    const run = (patch) => {
+      clearTimeout(this.job);
+      this.setState({ ...patch, phase: 'loading' });
+      this.job = setTimeout(() => this.setState({ phase: 'result' }), 1400);
+    };
+    const pill = (on) => on
+      ? 'background: #16161D; color: #FFFFFF; border-color: #16161D'
+      : 'background: rgba(255,255,255,0.7); color: #3A3A48; border-color: rgba(22,22,29,0.1)';
+    const seg = (on) => on
+      ? 'background: #FFFFFF; color: #16161D; box-shadow: 0 1px 3px rgba(22,22,29,0.1)'
+      : 'background: transparent; color: #4A4A58';
+    return {
+      accent,
+      glass,
+      isCompose: phase === 'compose',
+      isLoading: phase === 'loading',
+      isResult: phase === 'result',
+      typeWord: isTask ? 'task' : 'note',
+      prompt: prompts[type],
+      onPrompt: (e) => this.setState({ prompts: { ...prompts, [type]: e.target.value } }),
+      promptLabel: isTask ? 'Describe the task in your own words — AI fills in the details.' : 'Paste rough notes — AI turns them into a clean, formatted note.',
+      promptPlaceholder: isTask ? 'e.g. call Rafi about the invoice tomorrow, high priority' : 'e.g. meeting notes, ideas, a messy list…',
+      generate: () => run({}),
+      backToPrompt: () => {
+        clearTimeout(this.job);
+        this.setState({ phase: 'compose' });
+      },
+      out: {
+        title: d.title,
+        props: d.props,
+        blocks: d[format].map(([k, t]) => blk(k, t))
+      },
+      saveLabel: isTask ? 'Add task' : 'Save note',
+      saveHref: isTask ? 'TaskWindow.dc.html' : 'Notes.dc.html',
+      types: [
+        { key: 'task', label: 'Task' },
+        { key: 'note', label: 'Note' }
+      ].map((t) => ({ ...t, style: seg(type === t.key), pressed: type === t.key ? 'true' : 'false', pick: () => this.setState({ type: t.key }) })),
+      formats: [
+        { key: 'brief', label: 'Brief' },
+        { key: 'checklist', label: 'Checklist' },
+        { key: 'detailed', label: 'Detailed' }
+      ].map((f) => ({ ...f, style: pill(format === f.key), pressed: format === f.key ? 'true' : 'false', pick: () => this.setState({ format: f.key }) })),
+      refines: [
+        { key: 'brief', label: 'Shorter' },
+        { key: 'checklist', label: 'As checklist' },
+        { key: 'detailed', label: 'More detail' }
+      ].filter((r) => r.key !== format).map((r) => ({ ...r, pick: () => run({ format: r.key }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

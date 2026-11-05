@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daybook — Quick add</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FFFFFF}
+a{color:#4338CA}a:hover{color:#312E81}
+input::placeholder,textarea::placeholder{color:#6B6B7B}
+</style>
+</helmet>
+<div style="position: relative; min-height: 100vh; overflow: hidden; background: #FFFFFF; font-family: 'Geist', ui-sans-serif, system-ui, sans-serif; color: #16161D; -webkit-font-smoothing: antialiased">
+<div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; z-index: 0">
+<div style="position: absolute; top: -220px; left: -160px; width: 680px; height: 680px; border-radius: 50%; background: radial-gradient(closest-side, rgba(167,139,250,0.32), rgba(167,139,250,0))"></div>
+<div style="position: absolute; top: -160px; right: -120px; width: 640px; height: 640px; border-radius: 50%; background: radial-gradient(closest-side, rgba(253,186,116,0.28), rgba(253,186,116,0))"></div>
+<div style="position: absolute; top: 40%; left: 20%; width: 960px; height: 300px; border-radius: 50%; transform: rotate(-12deg); background: linear-gradient(90deg, rgba(147,197,253,0), rgba(147,197,253,0.26), rgba(196,181,253,0.24), rgba(196,181,253,0)); filter: blur(30px)"></div>
+<div style="position: absolute; bottom: -220px; left: 6%; width: 580px; height: 580px; border-radius: 50%; background: radial-gradient(closest-side, rgba(110,231,183,0.22), rgba(110,231,183,0))"></div>
+<div style="position: absolute; top: 20px; left: 32px; right: 32px; height: 58px; border-radius: 20px; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.9)"></div>
+<div style="position: absolute; top: 120px; left: 32px; width: 360px; height: 110px; border-radius: 20px; background: rgba(22,22,29,0.03)"></div>
+<div style="position: absolute; top: 270px; left: 32px; right: 32px; height: 60px; border-radius: 18px; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.9)"></div>
+<div style="position: absolute; top: 360px; left: 32px; width: 62%; height: 520px; border-radius: 24px; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.9)"></div>
+<div style="position: absolute; top: 360px; right: 32px; width: 30%; height: 220px; border-radius: 24px; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.9)"></div>
+<div style="position: absolute; inset: 0; background: rgba(246,245,252,0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px)"></div>
+</div>
+
+<div style="position: relative; z-index: 1; min-height: 100vh; box-sizing: border-box; padding: 96px 20px 48px; display: flex; justify-content: center; align-items: flex-start">
+<section role="dialog" aria-modal="true" aria-labelledby="qa-title" style="width: 100%; max-width: 680px; display: flex; flex-direction: column; border-radius: 28px; background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%); border: 1px solid rgba(255,255,255,0.95)">
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 18px 0 24px">
+<h2 id="qa-title" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Quick add</h2>
+<div role="group" aria-label="Item type" style="display: flex; gap: 2px; padding: 4px; border-radius: 13px; background: rgba(22,22,29,0.05)">
+<sc-for list="{{types}}" as="ty" hint-placeholder-count="2">
+<button type="button" aria-pressed="{{ty.pressed}}" onClick="{{ty.pick}}" style="display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px; border: none; border-radius: 9px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; {{ty.style}}">{{ty.label}}</button>
+</sc-for>
+</div>
+<a href="Main.dc.html" aria-label="Close" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(22,22,29,0.06); color: #3A3A48">
+<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M8 8l8 8M16 8l-8 8"></path></svg>
+</a>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 18px 24px 4px">
+<label for="qa-name" style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #5A5A6B">{{nameLabel}}</label>
+<input id="qa-name" type="text" placeholder="{{namePlaceholder}}" style="min-height: 48px; padding: 0; border: none; outline: none; background: transparent; font-family: inherit; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; color: #16161D">
+<label for="qa-body" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Details</label>
+<textarea id="qa-body" rows="{{bodyRows}}" placeholder="{{bodyPlaceholder}}" style="padding: 0; border: none; outline: none; resize: none; background: transparent; font-family: inherit; font-size: 15px; line-height: 1.6; color: #2A2A35"></textarea>
+</div>
+
+<div aria-hidden="true" style="height: 1px; margin: 12px 24px 0; background: rgba(22,22,29,0.08)"></div>
+
+<sc-if value="{{isTask}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 16px; padding: 18px 24px 20px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<span style="width: 72px; font-size: 13px; color: #4A4A58">Due</span>
+<div role="group" aria-label="Due date" style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{dues}}" as="d" hint-placeholder-count="3">
+<button type="button" aria-pressed="{{d.pressed}}" onClick="{{d.pick}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; {{d.style}}">{{d.label}}</button>
+</sc-for>
+</div>
+<label style="display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.7); color: #3A3A48; font-size: 13px">
+<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l2.5 2"></path></svg>
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Time</span>
+<input type="text" value="16:00" style="width: 52px; border: none; outline: none; background: transparent; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #16161D">
+</label>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<span style="width: 72px; font-size: 13px; color: #4A4A58">Priority</span>
+<div role="group" aria-label="Priority" style="display: flex; gap: 6px">
+<sc-for list="{{prios}}" as="p" hint-placeholder-count="3">
+<button type="button" aria-pressed="{{p.pressed}}" onClick="{{p.pick}}" style="display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; {{p.style}}"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: {{p.dot}}"></span>{{p.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<label for="qa-project" style="width: 72px; font-size: 13px; color: #4A4A58">Project</label>
+<div style="position: relative; display: flex; align-items: center">
+<span aria-hidden="true" style="position: absolute; left: 12px; width: 9px; height: 9px; border-radius: 3px; background: #6366F1; pointer-events: none"></span>
+<select id="qa-project" style="min-height: 36px; padding: 0 34px 0 30px; border-radius: 10px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.7); color: #16161D; font-family: inherit; font-size: 13px; font-weight: 500; appearance: none; -webkit-appearance: none; cursor: pointer">
+<option>Daybook App</option>
+<option>Client work</option>
+<option>Website</option>
+<option>Personal</option>
+</select>
+<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="position: absolute; right: 10px; color: #5A5A6B; pointer-events: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M6 9l6 6 6-6"></path></svg>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<span style="width: 72px; font-size: 13px; color: #4A4A58">Tag</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<button type="button" style="min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.7); color: #3A3A48; font-family: inherit; font-size: 13px; cursor: pointer">#work</button>
+<button type="button" style="min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.7); color: #3A3A48; font-family: inherit; font-size: 13px; cursor: pointer">#dev</button>
+<button type="button" style="min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.7); color: #3A3A48; font-family: inherit; font-size: 13px; cursor: pointer">#home</button>
+<button type="button" style="display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1.5px dashed rgba(22,22,29,0.18); background: transparent; color: #4A4A58; font-family: inherit; font-size: 13px; cursor: pointer"><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M12 5v14M5 12h14"></path></svg>New tag</button>
+</div>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 14px; background: rgba(22,22,29,0.035)">
+<span id="remind-label" style="font-size: 14px; color: #2A2A35">Remind me 15 minutes before</span>
+<button type="button" role="switch" aria-checked="{{remindChecked}}" aria-labelledby="remind-label" onClick="{{toggleRemind}}" style="position: relative; flex: none; width: 46px; height: 28px; padding: 0; border: none; border-radius: 999px; cursor: pointer; transition: background 0.2s ease; background: {{remindTrack}}">
+<span aria-hidden="true" style="position: absolute; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 3px rgba(22,22,29,0.25); transition: left 0.2s ease; left: {{remindKnob}}"></span>
+</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isNote}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 16px; padding: 18px 24px 20px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<span style="width: 72px; font-size: 13px; color: #4A4A58">Color</span>
+<div role="group" aria-label="Note color" style="display: flex; gap: 8px">
+<sc-for list="{{colors}}" as="c" hint-placeholder-count="5">
+<button type="button" aria-label="{{c.name}}" aria-pressed="{{c.pressed}}" onClick="{{c.pick}}" style="width: 32px; height: 32px; padding: 0; border-radius: 50%; cursor: pointer; background: {{c.hex}}; {{c.ring}}"></button>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<span style="width: 72px; font-size: 13px; color: #4A4A58">Folder</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<button type="button" style="min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid #16161D; background: #16161D; color: #FFFFFF; font-family: inherit; font-size: 13px; cursor: pointer">Ideas</button>
+<button type="button" style="min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.7); color: #3A3A48; font-family: inherit; font-size: 13px; cursor: pointer">Work</button>
+<button type="button" style="min-height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.7); color: #3A3A48; font-family: inherit; font-size: 13px; cursor: pointer">Personal</button>
+</div>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 14px; background: rgba(22,22,29,0.035)">
+<span id="pin-label" style="font-size: 14px; color: #2A2A35">Pin to Today</span>
+<button type="button" role="switch" aria-checked="{{remindChecked}}" aria-labelledby="pin-label" onClick="{{toggleRemind}}" style="position: relative; flex: none; width: 46px; height: 28px; padding: 0; border: none; border-radius: 999px; cursor: pointer; transition: background 0.2s ease; background: {{remindTrack}}">
+<span aria-hidden="true" style="position: absolute; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 3px rgba(22,22,29,0.25); transition: left 0.2s ease; left: {{remindKnob}}"></span>
+</button>
+</div>
+</div>
+</sc-if>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px 14px 24px; border-top: 1px solid rgba(22,22,29,0.07); border-radius: 0 0 28px 28px; background: rgba(255,255,255,0.45)">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px; font-size: 12px; color: #5A5A6B">
+<span style="display: inline-flex; align-items: center; gap: 6px"><kbd style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; padding: 2px 6px; border-radius: 6px; background: rgba(22,22,29,0.06); color: #3A3A48">Ctrl ↵</kbd>Save</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><kbd style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; padding: 2px 6px; border-radius: 6px; background: rgba(22,22,29,0.06); color: #3A3A48">Tab</kbd>Switch type</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><kbd style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; padding: 2px 6px; border-radius: 6px; background: rgba(22,22,29,0.06); color: #3A3A48">Esc</kbd>Close</span>
+</div>
+<div style="display: flex; gap: 8px">
+<a href="AIQuickAdd.dc.html" style="display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 14px; border-radius: 12px; background: rgba(79,70,229,0.10); color: #4338CA; font-size: 14px; font-weight: 600; text-decoration: none"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round"><path d="M12 3l1.8 4.7 4.7 1.8-4.7 1.8L12 16l-1.8-4.7-4.7-1.8 4.7-1.8z"></path><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"></path></svg>Write with AI</a>
+<a href="Main.dc.html" style="display: inline-flex; align-items: center; min-height: 42px; padding: 0 16px; border-radius: 12px; color: #3A3A48; font-size: 14px; font-weight: 500; text-decoration: none">Cancel</a>
+<a href="{{saveHref}}" style="display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 18px; border-radius: 12px; background: {{accent}}; color: #FFFFFF; font-size: 14px; font-weight: 600; text-decoration: none; box-shadow: 0 8px 20px rgba(79,70,229,0.28)">{{saveLabel}}</a>
+</div>
+</div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#4F46E5","options":["#4F46E5","#0F766E","#C2410C","#16161D"]},"glass":{"editor":"range","default":0.72,"min":0.4,"max":0.95,"step":0.05},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const st = this.state || {};
+    const accent = this.props.accent ?? '#4F46E5';
+    const glass = this.props.glass ?? 0.72;
+    const type = st.type || 'task';
+    const due = st.due || 'today';
+    const prio = st.prio || 'high';
+    const color = st.color || 'violet';
+    const remind = st.remind ?? true;
+    const isTask = type === 'task';
+    const pill = (on) => on
+      ? 'background: #16161D; color: #FFFFFF; border-color: #16161D'
+      : 'background: rgba(255,255,255,0.7); color: #3A3A48; border-color: rgba(22,22,29,0.1)';
+    const seg = (on) => on
+      ? 'background: #FFFFFF; color: #16161D; box-shadow: 0 1px 3px rgba(22,22,29,0.1)'
+      : 'background: transparent; color: #4A4A58';
+    return {
+      accent,
+      glass,
+      isTask,
+      isNote: !isTask,
+      nameLabel: isTask ? 'New task' : 'New note',
+      namePlaceholder: isTask ? 'What needs doing?' : 'Note title',
+      bodyPlaceholder: isTask ? 'Add details (optional)' : 'Start writing… type [ ] for a checklist',
+      bodyRows: isTask ? 2 : 6,
+      saveLabel: isTask ? 'Add task' : 'Save note',
+      saveHref: isTask ? 'Main.dc.html' : 'Notes.dc.html',
+      remindChecked: remind ? 'true' : 'false',
+      remindTrack: remind ? accent : 'rgba(22,22,29,0.18)',
+      remindKnob: remind ? '21px' : '3px',
+      toggleRemind: () => this.setState({ remind: !remind }),
+      types: [
+        { key: 'task', label: 'Task' },
+        { key: 'note', label: 'Note' }
+      ].map((t) => ({ ...t, style: seg(type === t.key), pressed: type === t.key ? 'true' : 'false', pick: () => this.setState({ type: t.key }) })),
+      dues: [
+        { key: 'today', label: 'Today' },
+        { key: 'tomorrow', label: 'Tomorrow' },
+        { key: 'pick', label: 'Pick a date' }
+      ].map((d) => ({ ...d, style: pill(due === d.key), pressed: due === d.key ? 'true' : 'false', pick: () => this.setState({ due: d.key }) })),
+      prios: [
+        { key: 'low', label: 'Low', dot: '#5FA898' },
+        { key: 'med', label: 'Medium', dot: '#6366F1' },
+        { key: 'high', label: 'High', dot: '#EA580C' }
+      ].map((p) => ({ ...p, style: pill(prio === p.key), pressed: prio === p.key ? 'true' : 'false', pick: () => this.setState({ prio: p.key }) })),
+      colors: [
+        { key: 'violet', name: 'Violet', hex: '#C4B5FD' },
+        { key: 'mint', name: 'Mint', hex: '#6EE7B7' },
+        { key: 'peach', name: 'Peach', hex: '#FDBA74' },
+        { key: 'sky', name: 'Sky', hex: '#93C5FD' },
+        { key: 'rose', name: 'Rose', hex: '#F9A8D4' }
+      ].map((c) => ({
+        ...c,
+        pressed: color === c.key ? 'true' : 'false',
+        ring: color === c.key ? 'border: 2px solid #FFFFFF; box-shadow: 0 0 0 2px #16161D' : 'border: 2px solid #FFFFFF; box-shadow: 0 0 0 1px rgba(22,22,29,0.12)',
+        pick: () => this.setState({ color: c.key })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

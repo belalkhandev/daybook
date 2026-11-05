@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daybook — AI settings</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FFFFFF}
+a{color:#4338CA}a:hover{color:#312E81}
+input::placeholder{color:#6B6B7B}
+</style>
+</helmet>
+<div style="position: relative; min-height: 100vh; overflow: hidden; background: #FFFFFF; font-family: 'Geist', ui-sans-serif, system-ui, sans-serif; color: #16161D; -webkit-font-smoothing: antialiased">
+<div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; z-index: 0">
+<div style="position: absolute; top: -200px; left: 18%; width: 820px; height: 520px; border-radius: 50%; background: radial-gradient(closest-side, rgba(167,139,250,0.28), rgba(167,139,250,0))"></div>
+<div style="position: absolute; top: 30%; right: -180px; width: 620px; height: 620px; border-radius: 50%; background: radial-gradient(closest-side, rgba(253,186,116,0.24), rgba(253,186,116,0))"></div>
+<div style="position: absolute; top: 55%; left: -180px; width: 640px; height: 640px; border-radius: 50%; background: radial-gradient(closest-side, rgba(110,231,183,0.22), rgba(110,231,183,0))"></div>
+<div style="position: absolute; bottom: -160px; left: 40%; width: 900px; height: 260px; border-radius: 50%; transform: rotate(-8deg); background: linear-gradient(90deg, rgba(147,197,253,0), rgba(147,197,253,0.24), rgba(244,114,182,0.14), rgba(244,114,182,0)); filter: blur(30px)"></div>
+</div>
+<div style="position: relative; z-index: 1; max-width: 1360px; margin: 0 auto; padding: 20px 32px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding: 10px 12px 10px 16px; border-radius: 20px; background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); border: 1px solid rgba(255,255,255,0.9)">
+<div style="display: flex; align-items: center; gap: 10px">
+<div aria-hidden="true" style="width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, {{accent}}, #A78BFA 55%, #FDBA74)"></div>
+<span style="font-size: 16px; font-weight: 600; letter-spacing: -0.01em">Daybook</span>
+</div>
+<nav aria-label="Views" style="display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 14px; background: rgba(22,22,29,0.045)">
+<a href="Main.dc.html" style="display: inline-flex; align-items: center; min-height: 36px; padding: 0 16px; border-radius: 10px; color: #4A4A58; font-size: 14px; font-weight: 500; text-decoration: none">Today</a>
+<button type="button" style="display: inline-flex; align-items: center; min-height: 36px; padding: 0 16px; border-radius: 10px; border: none; background: transparent; color: #4A4A58; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer">Upcoming</button>
+<a href="Notes.dc.html" style="display: inline-flex; align-items: center; min-height: 36px; padding: 0 16px; border-radius: 10px; color: #4A4A58; font-size: 14px; font-weight: 500; text-decoration: none">Notes</a>
+<button type="button" style="display: inline-flex; align-items: center; min-height: 36px; padding: 0 16px; border-radius: 10px; border: none; background: transparent; color: #4A4A58; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer">Calendar</button>
+</nav>
+<div style="display: flex; align-items: center; gap: 8px">
+<a href="AISettings.dc.html" aria-label="Settings" aria-current="page" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 11px; background: #16161D; color: #FFFFFF">
+<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>
+</a>
+<div aria-hidden="true" style="width: 1px; height: 22px; margin: 0 4px; background: rgba(22,22,29,0.1)"></div>
+<button type="button" aria-label="Minimize window" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 50%; background: rgba(22,22,29,0.06); color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M7 12h10"></path></svg></button>
+<button type="button" aria-label="Maximize window" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 50%; background: rgba(22,22,29,0.06); color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2"><rect x="7" y="7" width="10" height="10" rx="1.5"></rect></svg></button>
+<button type="button" aria-label="Close window" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 50%; background: rgba(22,22,29,0.06); color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M8 8l8 8M16 8l-8 8"></path></svg></button>
+</div>
+</header>
+
+<div style="width: 100%; max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<h1 style="margin: 0; font-size: 46px; line-height: 1.05; font-weight: 600; letter-spacing: -0.035em">Settings</h1>
+<nav aria-label="Settings sections" style="display: flex; flex-wrap: wrap; gap: 6px">
+<button type="button" style="min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.6); color: #3A3A48; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer">General</button>
+<button type="button" aria-current="page" style="display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid #16161D; background: #16161D; color: #FFFFFF; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer"><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round"><path d="M12 3l1.8 4.7 4.7 1.8-4.7 1.8L12 16l-1.8-4.7-4.7-1.8 4.7-1.8z"></path></svg>AI assistant</button>
+<button type="button" style="min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.6); color: #3A3A48; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Sync &amp; backup</button>
+<button type="button" style="min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.6); color: #3A3A48; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Shortcuts</button>
+</nav>
+</div>
+
+<section aria-labelledby="conn-h" style="display: flex; flex-direction: column; gap: 20px; padding: 26px 28px; border-radius: 24px; background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); border: 1px solid rgba(255,255,255,0.9)">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h2 id="conn-h" style="margin: 0; font-size: 18px; font-weight: 600">Connection</h2>
+<span style="font-size: 13px; color: #5A5A6B">Use your own API key. Daybook calls the API directly from this computer.</span>
+</div>
+<span style="display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; {{statusStyle}}"><span aria-hidden="true" style="width: 7px; height: 7px; border-radius: 50%; background: {{statusDot}}"></span>{{statusText}}</span>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #5A5A6B">Provider</span>
+<div role="group" aria-label="Provider" style="display: flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: 12px; background: rgba(22,22,29,0.05); align-self: flex-start">
+<sc-for list="{{providers}}" as="p" hint-placeholder-count="3">
+<button type="button" aria-pressed="{{p.pressed}}" onClick="{{p.pick}}" style="min-height: 36px; padding: 0 14px; border: none; border-radius: 9px; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; {{p.style}}">{{p.label}}</button>
+</sc-for>
+</div>
+</div>
+
+<sc-if value="{{showBaseUrl}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="base-url" style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #5A5A6B">Base URL</label>
+<input id="base-url" type="text" placeholder="{{baseUrlPlaceholder}}" style="min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid rgba(22,22,29,0.12); background: rgba(255,255,255,0.85); font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #16161D; outline: none">
+</div>
+</sc-if>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="api-key" style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #5A5A6B">API key</label>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<div style="flex: 1 1 320px; min-width: 0; display: flex; align-items: center; border-radius: 12px; border: 1px solid rgba(22,22,29,0.12); background: rgba(255,255,255,0.85)">
+<input id="api-key" type="{{keyType}}" value="{{apiKey}}" onChange="{{onKey}}" placeholder="sk-…" autocomplete="off" spellcheck="false" style="flex: 1 1 auto; min-width: 0; min-height: 44px; padding: 0 14px; border: none; outline: none; background: transparent; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #16161D">
+<button type="button" aria-label="{{eyeLabel}}" onClick="{{toggleShow}}" style="flex: none; width: 40px; height: 40px; margin-right: 2px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 10px; background: transparent; color: #4A4A58; cursor: pointer"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
+</div>
+<button type="button" onClick="{{test}}" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 18px; border-radius: 12px; border: 1px solid rgba(22,22,29,0.12); background: rgba(255,255,255,0.85); color: #16161D; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer">{{testLabel}}</button>
+</div>
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: #4A4A58"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>Stored in your system keyring (GNOME Keyring / KWallet), never in a config file.</span>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="model-id" style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #5A5A6B">Model</label>
+<input id="model-id" type="text" placeholder="Model ID from your account" style="min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid rgba(22,22,29,0.12); background: rgba(255,255,255,0.85); font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: #16161D; outline: none">
+<span style="font-size: 12px; color: #5A5A6B">A small, fast model is enough for tasks and notes.</span>
+</div>
+</section>
+
+<section aria-labelledby="feat-h" style="display: flex; flex-direction: column; gap: 6px; padding: 26px 28px; border-radius: 24px; background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); border: 1px solid rgba(255,255,255,0.9)">
+<h2 id="feat-h" style="margin: 0 0 8px; font-size: 18px; font-weight: 600">What AI can do</h2>
+<sc-for list="{{features}}" as="f" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid rgba(22,22,29,0.06)">
+<div style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
+<span id="{{f.id}}" style="font-size: 15px; font-weight: 500">{{f.title}}</span>
+<span style="font-size: 13px; color: #5A5A6B">{{f.desc}}</span>
+</div>
+<button type="button" role="switch" aria-checked="{{f.checked}}" aria-labelledby="{{f.id}}" onClick="{{f.toggle}}" style="position: relative; flex: none; width: 46px; height: 28px; padding: 0; border: none; border-radius: 999px; cursor: pointer; transition: background 0.2s ease; background: {{f.track}}">
+<span aria-hidden="true" style="position: absolute; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 3px rgba(22,22,29,0.25); transition: left 0.2s ease; left: {{f.knob}}"></span>
+</button>
+</div>
+</sc-for>
+</section>
+
+<section aria-labelledby="style-h" style="display: flex; flex-wrap: wrap; gap: 24px; padding: 26px 28px; border-radius: 24px; background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); border: 1px solid rgba(255,255,255,0.9)">
+<h2 id="style-h" style="flex: 1 1 100%; margin: 0; font-size: 18px; font-weight: 600">Writing style</h2>
+<div style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #5A5A6B">Default length</span>
+<div role="group" aria-label="Default length" style="display: flex; gap: 2px; padding: 3px; border-radius: 12px; background: rgba(22,22,29,0.05)">
+<sc-for list="{{lengths}}" as="l" hint-placeholder-count="3">
+<button type="button" aria-pressed="{{l.pressed}}" onClick="{{l.pick}}" style="flex: 1 1 0; min-height: 36px; border: none; border-radius: 9px; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; {{l.style}}">{{l.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 8px">
+<label for="out-lang" style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #5A5A6B">Output language</label>
+<div style="position: relative; display: flex; align-items: center">
+<select id="out-lang" style="width: 100%; min-height: 42px; padding: 0 36px 0 14px; border-radius: 12px; border: 1px solid rgba(22,22,29,0.12); background: rgba(255,255,255,0.85); color: #16161D; font-family: inherit; font-size: 14px; appearance: none; -webkit-appearance: none; cursor: pointer">
+<option>Same as my input</option>
+<option>English</option>
+<option>বাংলা (Bangla)</option>
+</select>
+<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" style="position: absolute; right: 12px; color: #5A5A6B; pointer-events: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M6 9l6 6 6-6"></path></svg>
+</div>
+</div>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-radius: 18px; background: rgba(22,22,29,0.035); border: 1px solid rgba(22,22,29,0.06)">
+<span style="display: inline-flex; align-items: center; gap: 10px; font-size: 13px; color: #3A3A48"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg>Only the text you send for a draft leaves your computer. Everything else stays local.</span>
+<div style="display: flex; gap: 8px">
+<a href="AIQuickAdd.dc.html" style="display: inline-flex; align-items: center; min-height: 42px; padding: 0 16px; border-radius: 12px; color: #3A3A48; font-size: 14px; font-weight: 500; text-decoration: none">Cancel</a>
+<a href="AIQuickAdd.dc.html" style="display: inline-flex; align-items: center; min-height: 42px; padding: 0 18px; border-radius: 12px; background: {{accent}}; color: #FFFFFF; font-size: 14px; font-weight: 600; text-decoration: none">Save changes</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#4F46E5","options":["#4F46E5","#0F766E","#C2410C","#16161D"]},"glass":{"editor":"range","default":0.55,"min":0.3,"max":0.9,"step":0.05},"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+  componentWillUnmount() {
+    clearTimeout(this.job);
+  }
+  renderVals() {
+    const st = this.state || {};
+    const accent = this.props.accent ?? '#4F46E5';
+    const glass = this.props.glass ?? 0.55;
+    const provider = st.provider || 'openai';
+    const show = !!st.show;
+    const apiKey = st.apiKey ?? 'sk-proj-a81f2c9e7d4b4f0b9e21c3d8';
+    const conn = st.conn || 'ok';
+    const length = st.length || 'balanced';
+    const flags = st.flags || { tasks: true, notes: true, suggest: true, summarize: false };
+    const seg = (on) => on
+      ? 'background: #FFFFFF; color: #16161D; box-shadow: 0 1px 3px rgba(22,22,29,0.1)'
+      : 'background: transparent; color: #4A4A58';
+    const connMap = {
+      ok: { text: 'Connected', dot: '#10B981', style: 'background: #E8F7F0; color: #1F6B4F' },
+      testing: { text: 'Testing…', dot: '#F59E0B', style: 'background: #FFF4E5; color: #8A4B08' },
+      empty: { text: 'No key yet', dot: '#9CA3AF', style: 'background: rgba(22,22,29,0.06); color: #4A4A58' }
+    };
+    const c = connMap[conn];
+    return {
+      accent,
+      glass,
+      providers: [
+        { key: 'openai', label: 'OpenAI' },
+        { key: 'compatible', label: 'OpenAI-compatible' },
+        { key: 'local', label: 'Local (Ollama)' }
+      ].map((p) => ({ ...p, style: seg(provider === p.key), pressed: provider === p.key ? 'true' : 'false', pick: () => this.setState({ provider: p.key }) })),
+      showBaseUrl: provider !== 'openai',
+      baseUrlPlaceholder: provider === 'local' ? 'http://localhost:11434/v1' : 'https://your-endpoint/v1',
+      apiKey,
+      keyType: show ? 'text' : 'password',
+      eyeLabel: show ? 'Hide API key' : 'Show API key',
+      toggleShow: () => this.setState({ show: !show }),
+      onKey: (e) => this.setState({ apiKey: e.target.value, conn: e.target.value ? 'ok' : 'empty' }),
+      statusText: c.text,
+      statusDot: c.dot,
+      statusStyle: c.style,
+      testLabel: conn === 'testing' ? 'Testing…' : 'Test connection',
+      test: () => {
+        if (!apiKey) return;
+        clearTimeout(this.job);
+        this.setState({ conn: 'testing' });
+        this.job = setTimeout(() => this.setState({ conn: 'ok' }), 1200);
+      },
+      features: [
+        { key: 'tasks', title: 'Write task details', desc: 'Turn a rough sentence into a task with steps and a markdown description.' },
+        { key: 'notes', title: 'Format notes', desc: 'Clean up messy notes into headings, lists and checklists.' },
+        { key: 'suggest', title: 'Suggest project, priority & time target', desc: 'Fill in properties from what you wrote. You can change them before saving.' },
+        { key: 'summarize', title: 'Summarize long comment threads', desc: 'Show a short summary at the top of busy tasks.' }
+      ].map((f) => {
+        const on = !!flags[f.key];
+        return {
+          ...f,
+          id: 'feat-' + f.key,
+          checked: on ? 'true' : 'false',
+          track: on ? accent : 'rgba(22,22,29,0.18)',
+          knob: on ? '21px' : '3px',
+          toggle: () => this.setState({ flags: { ...flags, [f.key]: !on } })
+        };
+      }),
+      lengths: [
+        { key: 'brief', label: 'Brief' },
+        { key: 'balanced', label: 'Balanced' },
+        { key: 'detailed', label: 'Detailed' }
+      ].map((l) => ({ ...l, style: seg(length === l.key), pressed: length === l.key ? 'true' : 'false', pick: () => this.setState({ length: l.key }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

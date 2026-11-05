@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daybook — Edit screenshot</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FFFFFF}
+a{color:#4338CA}a:hover{color:#312E81}
+</style>
+</helmet>
+<div style="position: relative; min-height: 100vh; overflow: hidden; background: #FFFFFF; font-family: 'Geist', ui-sans-serif, system-ui, sans-serif; color: #16161D; -webkit-font-smoothing: antialiased">
+<div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none; z-index: 0">
+<div style="position: absolute; top: -240px; left: 10%; width: 760px; height: 600px; border-radius: 50%; background: radial-gradient(closest-side, rgba(167,139,250,0.26), rgba(167,139,250,0))"></div>
+<div style="position: absolute; top: 20%; right: -200px; width: 640px; height: 640px; border-radius: 50%; background: radial-gradient(closest-side, rgba(253,186,116,0.22), rgba(253,186,116,0))"></div>
+<div style="position: absolute; bottom: -240px; left: -120px; width: 680px; height: 680px; border-radius: 50%; background: radial-gradient(closest-side, rgba(110,231,183,0.20), rgba(110,231,183,0))"></div>
+</div>
+<div style="position: relative; z-index: 1; min-height: 100vh; box-sizing: border-box; max-width: 1360px; margin: 0 auto; padding: 20px 32px 24px; display: flex; flex-direction: column; gap: 18px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px; border-radius: 18px; background: rgba(255,255,255,{{glass}}); backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%); border: 1px solid rgba(255,255,255,0.9)">
+<div style="display: flex; align-items: center; gap: 12px; min-width: 0">
+<a href="Shots.dc.html" style="display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 12px; border-radius: 11px; background: rgba(22,22,29,0.05); color: #16161D; font-size: 13px; font-weight: 500; text-decoration: none"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M19 12H5M11 6l-6 6 6 6"></path></svg>Shots</a>
+<div style="min-width: 0; display: flex; flex-direction: column">
+<span style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Sync bug in store.rs</span>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #5A5A6B">{{dims}} · PNG · edited</span>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<div style="display: flex; gap: 2px; padding: 3px; border-radius: 11px; background: rgba(22,22,29,0.05)">
+<button type="button" aria-label="Undo" title="Undo (Ctrl Z)" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M9 14L4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"></path></svg></button>
+<button type="button" aria-label="Redo" title="Redo (Ctrl Shift Z)" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M15 14l5-5-5-5M20 9H9a5 5 0 0 0 0 10h3"></path></svg></button>
+</div>
+<div style="display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 11px; background: rgba(22,22,29,0.05)">
+<button type="button" aria-label="Zoom out" onClick="{{zoomOut}}" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: #3A3A48; font-family: inherit; font-size: 18px; cursor: pointer">−</button>
+<span style="min-width: 52px; text-align: center; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #16161D">{{zoomLabel}}</span>
+<button type="button" aria-label="Zoom in" onClick="{{zoomIn}}" style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: transparent; color: #3A3A48; font-family: inherit; font-size: 18px; cursor: pointer">+</button>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<button type="button" style="min-height: 38px; padding: 0 12px; border-radius: 11px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.8); color: #3A3A48; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Copy</button>
+<button type="button" style="min-height: 38px; padding: 0 12px; border-radius: 11px; border: 1px solid rgba(22,22,29,0.1); background: rgba(255,255,255,0.8); color: #3A3A48; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer">Save as copy</button>
+<a href="Shots.dc.html" style="display: inline-flex; align-items: center; min-height: 38px; padding: 0 16px; border-radius: 11px; background: {{accent}}; color: #FFFFFF; font-size: 13px; font-weight: 600; text-decoration: none">Save</a>
+<div aria-hidden="true" style="width: 1px; height: 22px; margin: 0 2px; background: rgba(22,22,29,0.1)"></div>
+<button type="button" aria-label="Close window" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 50%; background: rgba(22,22,29,0.06); color: #3A3A48; cursor: pointer"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round"><path d="M8 8l8 8M16 8l-8 8"></path></svg></button>
+</div>
+</header>
+
+<div style="flex: 1 1 auto; display: flex; align-items: center; justify-content: center; min-height: 0; padding: 8px 0">
+<div style="position: relative; width: {{canvasWidth}}; max-width: 100%; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden; border: 1px solid rgba(22,22,29,0.1); transition: width 0.25s ease">
+<div style="position: absolute; inset: 0; overflow: hidden"><svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Screenshot being edited" style="display: block; width: 100%; height: 100%"><sc-for list="{{img.rects}}" as="q" hint-placeholder-count="3"><rect x="{{q.x}}" y="{{q.y}}" width="{{q.w}}" height="{{q.h}}" rx="{{q.rx}}" style="fill: {{q.f}}; opacity: {{q.o}}; stroke: {{q.s}}; stroke-width: {{q.sw}}"></rect></sc-for><sc-for list="{{img.circles}}" as="q" hint-placeholder-count="3"><circle cx="{{q.x}}" cy="{{q.y}}" r="{{q.r}}" style="fill: {{q.f}}"></circle></sc-for></svg></div>
+<svg viewBox="0 0 1600 1000" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%">
+<rect x="404" y="250" width="560" height="32" rx="6" style="fill: rgba(252,211,77,0.45)"></rect>
+<rect x="352" y="494" width="780" height="130" rx="12" style="fill: none; stroke: #EA580C; stroke-width: 6"></rect>
+<path d="M1380 820 Q1320 700 1150 640" style="fill: none; stroke: #EA580C; stroke-width: 8; stroke-linecap: round"></path>
+<path d="M1150 640 L1196 628 M1150 640 L1180 676" style="fill: none; stroke: #EA580C; stroke-width: 8; stroke-linecap: round"></path>
+<path d="M1190 170 c30 -34 60 34 90 0 s60 34 90 0 s60 34 90 0" style="fill: none; stroke: #6366F1; stroke-width: 6; stroke-linecap: round"></path>
+</svg>
+<div style="position: absolute; left: 22%; top: 75%; width: 40%; height: 9%; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; background: rgba(30,30,42,0.35); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #FFFFFF; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px"><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>Blurred</div>
+<span style="position: absolute; left: 79%; top: 84%; padding: 6px 12px; border-radius: 8px; background: #EA580C; color: #FFFFFF; font-size: 15px; font-weight: 600; white-space: nowrap">Bug is here</span>
+
+<sc-if value="{{isCrop}}" hint-placeholder-val="{{false}}">
+<div style="position: absolute; outline: 2px solid #FFFFFF; box-shadow: 0 0 0 4000px rgba(10,10,20,0.55); {{cropStyle}}">
+<span aria-hidden="true" style="position: absolute; left: 33.33%; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.45)"></span>
+<span aria-hidden="true" style="position: absolute; left: 66.66%; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.45)"></span>
+<span aria-hidden="true" style="position: absolute; top: 33.33%; left: 0; right: 0; height: 1px; background: rgba(255,255,255,0.45)"></span>
+<span aria-hidden="true" style="position: absolute; top: 66.66%; left: 0; right: 0; height: 1px; background: rgba(255,255,255,0.45)"></span>
+<span aria-hidden="true" style="position: absolute; top: -4px; left: -4px; width: 22px; height: 22px; border-top: 4px solid #FFFFFF; border-left: 4px solid #FFFFFF"></span>
+<span aria-hidden="true" style="position: absolute; top: -4px; right: -4px; width: 22px; height: 22px; border-top: 4px solid #FFFFFF; border-right: 4px solid #FFFFFF"></span>
+<span aria-hidden="true" style="position: absolute; bottom: -4px; left: -4px; width: 22px; height: 22px; border-bottom: 4px solid #FFFFFF; border-left: 4px solid #FFFFFF"></span>
+<span aria-hidden="true" style="position: absolute; bottom: -4px; right: -4px; width: 22px; height: 22px; border-bottom: 4px solid #FFFFFF; border-right: 4px solid #FFFFFF"></span>
+</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; max-width: 100%; min-height: 44px; padding: 6px 8px 6px 14px; border-radius: 16px; background: rgba(255,255,255,{{glassStrong}}); backdrop-filter: blur(24px) saturate(165%); -webkit-backdrop-filter: blur(24px) saturate(165%); border: 1px solid rgba(255,255,255,0.95)">
+<span style="font-size: 13px; font-weight: 600">{{toolName}}</span>
+<div aria-hidden="true" style="width: 1px; height: 22px; background: rgba(22,22,29,0.1)"></div>
+
+<sc-if value="{{isCrop}}" hint-placeholder-val="{{false}}">
+<div role="group" aria-label="Aspect ratio" style="display: flex; gap: 4px">
+<sc-for list="{{aspects}}" as="a" hint-placeholder-count="4">
+<button type="button" aria-pressed="{{a.pressed}}" onClick="{{a.pick}}" style="min-height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid; font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer; {{a.style}}">{{a.label}}</button>
+</sc-for>
+</div>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #4A4A58">{{cropDims}}</span>
+<button type="button" onClick="{{toSelect}}" style="min-height: 32px; padding: 0 10px; border: none; border-radius: 8px; background: transparent; color: #3A3A48; font-family: inherit; font-size: 13px; cursor: pointer">Cancel</button>
+<button type="button" onClick="{{toSelect}}" style="min-height: 32px; padding: 0 12px; border: none; border-radius: 8px; background: {{accent}}; color: #FFFFFF; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer">Apply crop</button>
+</sc-if>
+
+<sc-if value="{{isResize}}" hint-placeholder-val="{{false}}">
+<label style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #5A5A6B">W<input type="text" value="{{rw}}" style="width: 64px; min-height: 32px; padding: 0 8px; border-radius: 8px; border: 1px solid rgba(22,22,29,0.12); background: #FFFFFF; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #16161D"></label>
+<button type="button" aria-label="Keep aspect ratio" aria-pressed="true" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; background: rgba(79,70,229,0.10); color: #4338CA; cursor: pointer"><svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path></svg></button>
+<label style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #5A5A6B">H<input type="text" value="{{rh}}" style="width: 64px; min-height: 32px; padding: 0 8px; border-radius: 8px; border: 1px solid rgba(22,22,29,0.12); background: #FFFFFF; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #16161D"></label>
+<div role="group" aria-label="Scale" style="display: flex; gap: 4px">
+<sc-for list="{{scales}}" as="sc" hint-placeholder-count="4">
+<button type="button" aria-pressed="{{sc.pressed}}" onClick="{{sc.pick}}" style="min-height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid; font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer; {{sc.style}}">{{sc.label}}</button>
+</sc-for>
+</div>
+<button type="button" onClick="{{toSelect}}" style="min-height: 32px; padding: 0 12px; border: none; border-radius: 8px; background: {{accent}}; color: #FFFFFF; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer">Apply</button>
+</sc-if>
+
+<sc-if value="{{isDraw}}" hint-placeholder-val="{{true}}">
+<div role="group" aria-label="Colour" style="display: flex; gap: 6px">
+<sc-for list="{{colors}}" as="c" hint-placeholder-count="6">
+<button type="button" aria-label="{{c.name}}" aria-pressed="{{c.pressed}}" onClick="{{c.pick}}" style="width: 26px; height: 26px; padding: 0; border-radius: 50%; cursor: pointer; background: {{c.hex}}; {{c.ring}}"></button>
+</sc-for>
+</div>
+<div aria-hidden="true" style="width: 1px; height: 22px; background: rgba(22,22,29,0.1)"></div>
+<div role="group" aria-label="Size" style="display: flex; gap: 4px">
+<sc-for list="{{sizes}}" as="z" hint-placeholder-count="3">
+<button type="button" aria-label="{{z.name}}" aria-pressed="{{z.pressed}}" onClick="{{z.pick}}" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 8px; cursor: pointer; {{z.style}}"><span aria-hidden="true" style="border-radius: 50%; background: currentColor; width: {{z.dot}}; height: {{z.dot}}"></span></button>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{isSelect}}" hint-placeholder-val="{{false}}">
+<span style="font-size: 13px; color: #4A4A58">Click a mark to move, resize or delete it</span>
+</sc-if>
+</div>
+
+<div role="toolbar" aria-label="Editing tools" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; max-width: 100%; padding: 6px; border-radius: 20px; background: rgba(255,255,255,{{glassStrong}}); backdrop-filter: blur(24px) saturate(165%); -webkit-backdrop-filter: blur(24px) saturate(165%); border: 1px solid rgba(255,255,255,0.95)">
+<sc-for list="{{tools}}" as="t" hint-placeholder-count="9">
+<sc-if value="{{t.gap}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="width: 1px; height: 28px; margin: 0 6px; background: rgba(22,22,29,0.12)"></span></sc-if>
+<button type="button" aria-label="{{t.label}}" title="{{t.title}}" aria-pressed="{{t.pressed}}" onClick="{{t.pick}}" style="width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; padding: 0; border: none; border-radius: 13px; cursor: pointer; {{t.style}}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="{{t.d}}"></path></svg></button>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#4F46E5","options":["#4F46E5","#0F766E","#C2410C","#16161D"]},"glass":{"editor":"range","default":0.55,"min":0.3,"max":0.9,"step":0.05},"$preview":{"width":1440,"height":980}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const st = this.state || {};
+    const accent = this.props.accent ?? '#4F46E5';
+    const glass = this.props.glass ?? 0.55;
+    const tool = st.tool || 'arrow';
+    const color = st.color || '#EA580C';
+    const size = st.size ?? 1;
+    const aspect = st.aspect || 'free';
+    const scale = st.scale ?? 100;
+    const zoom = st.zoom ?? 100;
+    const baseW = 1037, baseH = 648;
+    const mock = (kind, seed) => {
+      const W = 1600, H = 1000;
+      const rects = [];
+      const circles = [];
+      const r = (x, y, w, h, f, rx, o, s) => rects.push({ x, y, w, h, f, rx: rx || 0, o: o ?? 1, s: s || 'none', sw: s ? 2 : 0 });
+      const c = (x, y, rr, f) => circles.push({ x, y, r: rr, f });
+      const widths = [520, 760, 430, 880, 610, 340, 700, 560, 820, 480, 650, 390, 720, 300, 590, 680, 450, 770];
+      const w = (i) => widths[(i + seed * 5) % widths.length];
+      const dots = (y) => { c(36, y, 9, '#FF5F57'); c(66, y, 9, '#FEBC2E'); c(96, y, 9, '#28C840'); };
+      if (kind === 'code') {
+        r(0, 0, W, H, '#1E1E2A'); r(0, 0, W, 64, '#2A2A38'); dots(32); r(0, 64, 260, H - 64, '#232330');
+        for (let i = 0; i < 14; i++) r(36, 110 + i * 56, 120 + (i * 37) % 110, 14, '#4A4A5E', 7);
+        const cols = ['#C4B5FD', '#E6E6EE', '#86EFAC', '#7DD3FC', '#FDBA74', '#9CA3AF'];
+        const ind = [0, 1, 1, 2, 2, 1, 0, 1, 2, 3, 2, 1, 0, 1, 1, 0, 0];
+        for (let i = 0; i < 17; i++) { r(300, 108 + i * 50, 30, 14, '#4A4A5E', 4); r(360 + ind[i] * 48, 106 + i * 50, Math.round(w(i) * 0.8), 18, cols[(i + seed) % cols.length], 9, 0.85); }
+      } else if (kind === 'web') {
+        r(0, 0, W, H, '#FFFFFF'); r(0, 0, W, 72, '#F3F4F6'); dots(36); r(420, 18, 760, 36, '#FFFFFF', 18); r(160, 120, 1280, 300, ['#EEF0FF', '#FFF1E8', '#EAF3F0'][seed % 3], 24); r(220, 190, 620, 44, '#16161D', 10, 0.85); r(220, 256, 460, 22, '#5A5A6B', 11, 0.5); r(220, 330, 180, 52, '#4F46E5', 14);
+        for (let i = 0; i < 3; i++) { r(160 + i * 440, 470, 400, 300, '#F8F8FB', 20, 1, '#E5E7EB'); r(200 + i * 440, 510, 220, 22, '#16161D', 11, 0.7); r(200 + i * 440, 550, 300, 14, '#9CA3AF', 7); r(200 + i * 440, 576, 260, 14, '#9CA3AF', 7); }
+      } else if (kind === 'terminal') {
+        r(0, 0, W, H, '#0F1115'); r(0, 0, W, 56, '#1A1D24'); dots(28);
+        for (let i = 0; i < 18; i++) { r(40, 96 + i * 48, 24, 16, '#86EFAC', 4); r(80, 96 + i * 48, Math.round(w(i) * 0.9), 16, i % 5 === 4 ? '#F87171' : (i % 3 === 0 ? '#86EFAC' : '#9CA3AF'), 8, 0.8); }
+      } else if (kind === 'design') {
+        r(0, 0, W, H, '#E9E9EE'); r(0, 0, W, 56, '#FFFFFF'); r(0, 56, 220, H - 56, '#F7F7F9');
+        for (let i = 0; i < 10; i++) r(30, 90 + i * 40, 150, 14, '#C9C9D3', 7);
+        for (let i = 0; i < 3; i++) {
+          const x = 300 + i * 430;
+          r(x, 120, 380, 780, '#FFFFFF', 18, 1, '#DADAE3'); c(x + 190, 300, 90, ['#C4B5FD', '#FDBA74', '#6EE7B7'][(i + seed) % 3]); r(x + 40, 440, 300, 26, '#16161D', 13, 0.8); r(x + 40, 490, 240, 16, '#9CA3AF', 8); r(x + 40, 520, 280, 16, '#9CA3AF', 8); r(x + 40, 820, 140, 48, '#4F46E5', 14);
+        }
+      } else if (kind === 'chart') {
+        r(0, 0, W, H, '#FFFFFF'); r(0, 0, W, 72, '#F3F4F6'); dots(36); r(120, 110, 420, 40, '#16161D', 12, 0.85); r(120, 168, 260, 20, '#9CA3AF', 10);
+        for (let i = 0; i < 3; i++) { r(120 + i * 460, 220, 420, 130, '#F8F8FB', 18, 1, '#E5E7EB'); r(150 + i * 460, 250, 140, 16, '#9CA3AF', 8); r(150 + i * 460, 285, 200, 36, '#16161D', 10, 0.8); }
+        const hs = [180, 260, 220, 340, 300, 420, 380, 460, 400, 500, 470, 520];
+        r(120, 900, 1360, 3, '#E5E7EB');
+        for (let i = 0; i < 12; i++) r(150 + i * 110, 900 - hs[i], 70, hs[i], i % 2 ? '#A78BFA' : '#6366F1', 10);
+      } else {
+        r(0, 0, W, H, '#ECECF1'); r(560, 50, 480, 900, '#FFFFFF', 12); c(800, 130, 34, '#10B981'); r(680, 190, 240, 22, '#16161D', 11, 0.8); r(720, 226, 160, 14, '#9CA3AF', 7);
+        for (let i = 0; i < 9; i++) { r(620, 300 + i * 52, 200 + (i * 53) % 120, 14, '#9CA3AF', 7); r(900, 300 + i * 52, 80, 14, '#6B6B7B', 7); }
+        r(620, 790, 360, 2, '#E5E7EB'); r(620, 820, 140, 24, '#16161D', 12); r(860, 814, 120, 32, '#16161D', 12);
+      }
+      return { rects, circles };
+    };
+    const crops = {
+      free: { l: 8, t: 6, w: 80, h: 84 },
+      '16:9': { l: 6, t: 10.4, w: 88, h: 79.2 },
+      '4:3': { l: 15, t: 8, w: 70, h: 84 },
+      '1:1': { l: 25, t: 10, w: 50, h: 80 }
+    };
+    const cr = crops[aspect];
+    const pill = (on) => on
+      ? 'background: #16161D; color: #FFFFFF; border-color: #16161D'
+      : 'background: rgba(255,255,255,0.8); color: #3A3A48; border-color: rgba(22,22,29,0.1)';
+    const toolDefs = [
+      { key: 'select', label: 'Select', key2: 'V', d: 'M5 3l14 8-6 2-2 6z' },
+      { key: 'crop', label: 'Crop', key2: 'C', d: 'M6 2v14a2 2 0 0 0 2 2h14M2 6h14a2 2 0 0 1 2 2v14' },
+      { key: 'resize', label: 'Resize', key2: 'R', d: 'M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7' },
+      { key: 'pen', label: 'Pen', key2: 'P', d: 'M4 20h4L19 9l-4-4L4 16z', gap: true },
+      { key: 'highlight', label: 'Highlighter', key2: 'H', d: 'M9 11l-6 6v3h9l3-3M22 12l-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4' },
+      { key: 'arrow', label: 'Arrow', key2: 'A', d: 'M5 19L19 5M9 5h10v10' },
+      { key: 'rect', label: 'Rectangle', key2: 'B', d: 'M6 5h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z' },
+      { key: 'text', label: 'Text', key2: 'T', d: 'M5 6V4h14v2M12 4v16M9 20h6' },
+      { key: 'blur', label: 'Blur', key2: 'X', d: 'M4 4h4v4H4zM10 10h4v4h-4zM16 4h4v4h-4zM4 16h4v4H4zM16 16h4v4h-4z' }
+    ];
+    const cur = toolDefs.find((t) => t.key === tool);
+    const drawTools = ['pen', 'highlight', 'arrow', 'rect', 'text', 'blur'];
+    return {
+      accent,
+      glass,
+      glassStrong: Math.min(0.95, glass + 0.25).toFixed(2),
+      img: mock('code', 0),
+      dims: Math.round(baseW * scale / 100) + ' × ' + Math.round(baseH * scale / 100),
+      zoomLabel: zoom + '%',
+      canvasWidth: Math.round(1000 * zoom / 100) + 'px',
+      zoomIn: () => this.setState({ zoom: Math.min(150, zoom + 10) }),
+      zoomOut: () => this.setState({ zoom: Math.max(50, zoom - 10) }),
+      toolName: cur.label,
+      isCrop: tool === 'crop',
+      isResize: tool === 'resize',
+      isSelect: tool === 'select',
+      isDraw: drawTools.includes(tool),
+      toSelect: () => this.setState({ tool: 'select' }),
+      cropStyle: 'left: ' + cr.l + '%; top: ' + cr.t + '%; width: ' + cr.w + '%; height: ' + cr.h + '%',
+      cropDims: Math.round(baseW * cr.w / 100) + ' × ' + Math.round(baseH * cr.h / 100),
+      aspects: ['free', '16:9', '4:3', '1:1'].map((a) => ({ label: a === 'free' ? 'Free' : a, style: pill(aspect === a), pressed: aspect === a ? 'true' : 'false', pick: () => this.setState({ aspect: a }) })),
+      rw: String(Math.round(baseW * scale / 100)),
+      rh: String(Math.round(baseH * scale / 100)),
+      scales: [25, 50, 75, 100].map((p) => ({ label: p + '%', style: pill(scale === p), pressed: scale === p ? 'true' : 'false', pick: () => this.setState({ scale: p }) })),
+      colors: [
+        { name: 'Orange', hex: '#EA580C' },
+        { name: 'Indigo', hex: '#6366F1' },
+        { name: 'Green', hex: '#10B981' },
+        { name: 'Yellow', hex: '#FCD34D' },
+        { name: 'Black', hex: '#16161D' },
+        { name: 'White', hex: '#FFFFFF' }
+      ].map((c) => ({
+        ...c,
+        pressed: color === c.hex ? 'true' : 'false',
+        ring: color === c.hex ? 'border: 2px solid #FFFFFF; box-shadow: 0 0 0 2px #16161D' : 'border: 2px solid #FFFFFF; box-shadow: 0 0 0 1px rgba(22,22,29,0.18)',
+        pick: () => this.setState({ color: c.hex })
+      })),
+      sizes: [
+        { name: 'Thin', dot: '6px' },
+        { name: 'Medium', dot: '10px' },
+        { name: 'Thick', dot: '15px' }
+      ].map((z, i) => ({
+        ...z,
+        pressed: size === i ? 'true' : 'false',
+        style: size === i ? 'background: rgba(22,22,29,0.08); color: #16161D' : 'background: transparent; color: #6B6B7B',
+        pick: () => this.setState({ size: i })
+      })),
+      tools: toolDefs.map((t) => ({
+        ...t,
+        title: t.label + ' (' + t.key2 + ')',
+        pressed: tool === t.key ? 'true' : 'false',
+        style: tool === t.key ? 'background: #16161D; color: #FFFFFF' : 'background: transparent; color: #3A3A48',
+        pick: () => this.setState({ tool: t.key })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>
