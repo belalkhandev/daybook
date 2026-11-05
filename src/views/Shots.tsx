@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+import { reveal } from "../lib/motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../components/Icon";
 import { useDataChanged, useOutside } from "../lib/hooks";
@@ -170,7 +172,7 @@ function Details({ shot }: { shot: Shot }) {
   };
 
   const openLink = () => {
-    if (shot.task) void call("open_task_window", { id: shot.task.id });
+    if (shot.task) useUI.getState().setModal({ type: "task", id: shot.task.id });
     else if (shot.note) {
       selectNote(shot.note.id);
       go("notes");
@@ -407,10 +409,10 @@ export function Shots() {
                 </span>
               </div>
               <div className="shot-grid">
-                {g.items.map((s) => {
+                {g.items.map((s, idx) => {
                   const on = sel?.id === s.id;
                   return (
-                    <button key={s.id} type="button" className={`glass shot-card${on ? " is-on" : ""}`} aria-pressed={on} onClick={() => selectShot(s.id)}>
+                    <motion.button {...reveal(idx)} whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }} key={s.id} type="button" className={`glass shot-card${on ? " is-on" : ""}`} aria-pressed={on} onClick={() => selectShot(s.id)}>
                       <div className="shot-preview">
                         <img src={assetUrl(s.thumb)} alt="" loading="lazy" />
                       </div>
@@ -421,7 +423,7 @@ export function Shots() {
                         </span>
                         {s.tag && <span className="shot-tag">#{s.tag}</span>}
                       </span>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>

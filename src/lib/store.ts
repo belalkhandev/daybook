@@ -9,7 +9,8 @@ export type Modal =
   | null
   | { type: "quick"; kind: ItemKind }
   | { type: "ai"; kind: ItemKind }
-  | { type: "search" };
+  | { type: "search" }
+  | { type: "task"; id: string };
 
 interface UI {
   view: View;

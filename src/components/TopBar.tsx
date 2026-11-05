@@ -1,3 +1,6 @@
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { spring } from "../lib/motion";
 import { win } from "../lib/ipc";
 import { useUI, type View } from "../lib/store";
 import { Icon } from "./Icon";
@@ -11,13 +14,19 @@ const ITEMS: { view: View; label: string }[] = [
 ];
 
 export function WindowControls() {
+  const [max, setMax] = useState(false);
+  useEffect(() => {
+    const sync = () => void win.isMaximized().then(setMax);
+    sync();
+    return win.onResized(sync);
+  }, []);
   return (
     <>
       <button type="button" className="win-btn" aria-label="Minimize window" onClick={() => void win.minimize()}>
         <Icon name="minimize" size={14} />
       </button>
-      <button type="button" className="win-btn" aria-label="Maximize window" onClick={() => void win.toggleMaximize()}>
-        <Icon name="maximize" size={14} />
+      <button type="button" className="win-btn" aria-label={max ? "Restore window" : "Maximize window"} onClick={() => void win.toggleMaximize()}>
+        <Icon name={max ? "restore" : "maximize"} size={14} />
       </button>
       <button type="button" className="win-btn" aria-label="Close window" onClick={() => void win.close()}>
         <Icon name="close" size={14} />
@@ -51,7 +60,8 @@ export function TopBar() {
             aria-current={view === i.view ? "page" : undefined}
             onClick={() => go(i.view)}
           >
-            {i.label}
+            {view === i.view && <motion.span layoutId="nav-pill" className="nav-pill" transition={spring} />}
+            <span className="nav-label">{i.label}</span>
           </button>
         ))}
       </nav>
@@ -63,10 +73,10 @@ export function TopBar() {
               Search
               <kbd className="kbd">Ctrl K</kbd>
             </button>
-            <button type="button" className="btn-new" onClick={() => setModal({ type: "quick", kind: "task" })}>
+            <motion.button whileTap={{ scale: 0.94 }} whileHover={{ scale: 1.04 }} type="button" className="btn-new" onClick={() => setModal({ type: "quick", kind: "task" })}>
               <Icon name="plus" />
               New
-            </button>
+            </motion.button>
           </>
         )}
         <button

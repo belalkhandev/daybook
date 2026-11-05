@@ -81,6 +81,19 @@ export const win = {
   minimize: () => (inTauri ? getCurrentWindow().minimize() : Promise.resolve()),
   toggleMaximize: () => (inTauri ? getCurrentWindow().toggleMaximize() : Promise.resolve()),
   close: () => (inTauri ? getCurrentWindow().close() : Promise.resolve()),
+  isMaximized: () => (inTauri ? getCurrentWindow().isMaximized() : Promise.resolve(false)),
+  onResized: (fn: () => void): (() => void) => {
+    if (!inTauri) return () => undefined;
+    let off: (() => void) | undefined;
+    let dead = false;
+    void getCurrentWindow()
+      .onResized(fn)
+      .then((u) => (dead ? u() : (off = u)));
+    return () => {
+      dead = true;
+      off?.();
+    };
+  },
 };
 
 export function openExternal(url: string) {

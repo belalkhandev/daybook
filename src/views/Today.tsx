@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../components/Icon";
 import { useDataChanged, useNow, useOutside } from "../lib/hooks";
 import { call, errorMessage } from "../lib/ipc";
+import { motion } from "framer-motion";
+import { reveal } from "../lib/motion";
 import { useUI } from "../lib/store";
 import type { DayCount, Note, QuickAddResult, Status, Task } from "../lib/types";
 import {
@@ -31,7 +33,7 @@ function TaskMenu({ task, onClose }: { task: Task; onClose: () => void }) {
   };
   return (
     <div ref={ref} className="popover" style={{ right: 0, top: 36 }} role="menu">
-      <button type="button" className="popover-item" role="menuitem" onClick={() => run(() => call("open_task_window", { id: task.id }))}>
+      <button type="button" className="popover-item" role="menuitem" onClick={() => run(() => Promise.resolve(useUI.getState().setModal({ type: "task", id: task.id })))}>
         Edit
       </button>
       <button type="button" className="popover-item" role="menuitem" onClick={() => run(() => call("move_task_to_tomorrow", { id: task.id }))}>
@@ -44,12 +46,12 @@ function TaskMenu({ task, onClose }: { task: Task; onClose: () => void }) {
   );
 }
 
-function TaskRow({ task, onToggle }: { task: Task; onToggle: (t: Task) => void }) {
+function TaskRow({ task, onToggle, index }: { task: Task; onToggle: (t: Task) => void; index: number }) {
   const [menu, setMenu] = useState(false);
   const done = task.status === "done";
   const pr = PRIORITY[task.priority];
   return (
-    <div className="row-card task-row">
+    <motion.div className="row-card task-row" {...reveal(index)}>
       <button
         type="button"
         className={`check task-check${done ? " is-on" : ""}`}
@@ -64,7 +66,7 @@ function TaskRow({ task, onToggle }: { task: Task; onToggle: (t: Task) => void }
           className={`task-title${done ? " is-done" : ""}`}
           onClick={(e) => {
             e.preventDefault();
-            void call("open_task_window", { id: task.id });
+            useUI.getState().setModal({ type: "task", id: task.id });
           }}
         >
           {task.title}
@@ -92,7 +94,7 @@ function TaskRow({ task, onToggle }: { task: Task; onToggle: (t: Task) => void }
         </button>
         {menu && <TaskMenu task={task} onClose={() => setMenu(false)} />}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -266,8 +268,8 @@ export function Today() {
               <span className="mono-label" style={{ padding: "0 4px" }}>
                 {g.name}
               </span>
-              {g.items.map((t) => (
-                <TaskRow key={t.id} task={t} onToggle={toggle} />
+              {g.items.map((t, i) => (
+                <TaskRow key={t.id} task={t} onToggle={toggle} index={i} />
               ))}
             </div>
           ))}

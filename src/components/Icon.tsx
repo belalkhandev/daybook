@@ -17,6 +17,11 @@ const DEFS: Record<string, Def> = {
   search: { d: ["M20 20l-3.5-3.5"], extra: <circle cx="11" cy="11" r="7" /> },
   minimize: { d: ["M7 12h10"], sw: 2 },
   maximize: { extra: <rect x="7" y="7" width="10" height="10" rx="1.5" />, sw: 2 },
+  restore: {
+    d: ["M9.5 9.5V7.5a1.5 1.5 0 0 1 1.5-1.5h5.5A1.5 1.5 0 0 1 18 7.5V13a1.5 1.5 0 0 1-1.5 1.5h-2"],
+    extra: <rect x="6" y="9.5" width="8.5" height="8.5" rx="1.5" />,
+    sw: 2,
+  },
   close: { d: ["M8 8l8 8M16 8l-8 8"], sw: 2 },
   check: { d: ["M5 12.5l4.5 4.5L19 7.5"], sw: 2.6 },
   clock: { d: ["M12 8v4l2.5 2"], extra: <circle cx="12" cy="12" r="8" />, sw: 2 },

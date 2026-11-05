@@ -1,4 +1,7 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { Modal } from "./components/Modal";
+import TaskApp from "./views/TaskApp";
 import { Blobs } from "./components/Blobs";
 import { TopBar } from "./components/TopBar";
 import { call, onDataChanged, onEvent } from "./lib/ipc";
@@ -81,16 +84,34 @@ export default function App() {
       <Blobs variant={blobs} />
       <div className="page">
         <TopBar />
-        {loaded && view === "today" && <Today />}
-        {loaded && view === "notes" && <Notes />}
-        {loaded && view === "shots" && <Shots />}
-        {view === "upcoming" && <ComingSoon title="Upcoming" />}
-        {view === "calendar" && <ComingSoon title="Calendar" />}
-        {loaded && view === "settings" && <SettingsView />}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={view}
+            className="view-slot"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {loaded && view === "today" && <Today />}
+            {loaded && view === "notes" && <Notes />}
+            {loaded && view === "shots" && <Shots />}
+            {view === "upcoming" && <ComingSoon title="Upcoming" />}
+            {view === "calendar" && <ComingSoon title="Calendar" />}
+            {loaded && view === "settings" && <SettingsView />}
+          </motion.div>
+        </AnimatePresence>
       </div>
-      {modal?.type === "quick" && <QuickAddModal key={modal.kind} initial={modal.kind} />}
-      {modal?.type === "ai" && <AiModal key={modal.kind} initial={modal.kind} />}
-      {modal?.type === "search" && <SearchModal />}
+      <AnimatePresence>
+        {modal?.type === "quick" && <QuickAddModal key={"q" + modal.kind} initial={modal.kind} />}
+        {modal?.type === "ai" && <AiModal key={"a" + modal.kind} initial={modal.kind} />}
+        {modal?.type === "search" && <SearchModal key="search" />}
+        {modal?.type === "task" && (
+          <Modal key={"t" + modal.id} onClose={() => useUI.getState().setModal(null)} top={24} maxWidth={1180} labelledBy="task-title">
+            <TaskApp id={modal.id} onClose={() => useUI.getState().setModal(null)} />
+          </Modal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -42,7 +42,7 @@ export function SearchModal() {
         dot: x.project?.color ?? "#9CA3AF",
         open: () => {
           setModal(null);
-          void call("open_task_window", { id: x.id });
+          useUI.getState().setModal({ type: "task", id: x.id });
         },
       }));
       const nh: Hit[] = notes.slice(0, 10).map((n) => ({

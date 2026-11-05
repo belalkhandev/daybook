@@ -192,8 +192,7 @@ p {
   width: 30px;
   height: 30px;
   border-radius: 9px;
-  background: linear-gradient(135deg, var(--accent), #a78bfa 55%, #fdba74);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  background: url("/brand.png") center / cover no-repeat;
 }
 
 .brand-name {
@@ -687,4 +686,31 @@ p {
   background: linear-gradient(90deg, rgba(22, 22, 29, 0.05) 0, rgba(var(--accent-rgb), 0.14) 50%, rgba(22, 22, 29, 0.05) 100%);
   background-size: 1200px 100%;
   animation: dbShimmer 1.3s linear infinite;
+}
+
+.view-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.nav-item {
+  position: relative;
+}
+
+.nav-item.is-active {
+  background: transparent;
+  box-shadow: none;
+}
+
+.nav-pill {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: var(--sh-nav);
+}
+
+.nav-label {
+  position: relative;
 }

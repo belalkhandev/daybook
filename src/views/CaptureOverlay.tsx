@@ -64,8 +64,13 @@ export function CaptureOverlay() {
   const [info, setInfo] = useState<CaptureInfo | null>(null);
   const [mode, setMode] = useState<CaptureMode>(() => load<CaptureMode>("cap.mode", "area"));
   const [delay, setDelay] = useState<number>(() => load("cap.delay", 0));
-  const [opts, setOpts] = useState<{ ocr: boolean; edit: boolean }>(() => load("cap.opts", { ocr: true, edit: false }));
-  const [box, setBox] = useState<Box | null>(null);
+  const [opts, setOpts] = useState<{ ocr: boolean; edit: boolean; remember: boolean }>(() => ({ remember: false, ...load("cap.opts", { ocr: true, edit: false }) }));
+  const [box, setBox] = useState<Box | null>(() => {
+    const o = { remember: false, ...load<{ remember?: boolean }>("cap.opts", {}) };
+    const f = o.remember ? load<Box | null>("cap.area", null) : null;
+    if (!f) return null;
+    return { x: f.x * window.innerWidth, y: f.y * window.innerHeight, w: f.w * window.innerWidth, h: f.h * window.innerHeight };
+  });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const drag = useRef<{ kind: DragKind; sx: number; sy: number; orig: Box } | null>(null);
@@ -83,6 +88,9 @@ export function CaptureOverlay() {
   useEffect(() => save("cap.mode", mode), [mode]);
   useEffect(() => save("cap.delay", delay), [delay]);
   useEffect(() => save("cap.opts", opts), [opts]);
+  useEffect(() => {
+    if (!opts.remember) save("cap.area", null);
+  }, [opts.remember]);
 
   const size = () => ({ w: window.innerWidth, h: window.innerHeight });
   const scale = useMemo(() => (info ? { x: info.width / window.innerWidth, y: info.height / window.innerHeight } : { x: 1, y: 1 }), [info]);
@@ -101,6 +109,10 @@ export function CaptureOverlay() {
       if (mode === "area" && (!box || box.w < 8 || box.h < 8)) {
         setError("Drag to select an area first.");
         return;
+      }
+      if (opts.remember && mode === "area" && box) {
+        const { w: W, h: H } = size();
+        save("cap.area", { x: box.x / W, y: box.y / H, w: box.w / W, h: box.h / H });
       }
       setBusy(true);
       const rect = mode === "area" && box ? { x: box.x * scale.x, y: box.y * scale.y, w: box.w * scale.x, h: box.h * scale.y } : null;
@@ -224,6 +236,7 @@ export function CaptureOverlay() {
           [
             ["ocr", "Read text (OCR)"],
             ["edit", "Open editor after"],
+            ["remember", "Remember area"],
           ] as const
         ).map(([k, label]) => (
           <button key={k} type="button" className={`cap-opt${opts[k] ? " is-on" : ""}`} aria-pressed={opts[k]} onClick={() => setOpts({ ...opts, [k]: !opts[k] })}>

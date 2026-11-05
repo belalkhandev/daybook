@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+import { reveal } from "../lib/motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../components/Icon";
 import { Markdown } from "../components/Markdown";
@@ -341,10 +343,10 @@ export function Notes() {
             </span>
             New note
           </button>
-          {notes.map((n) => {
+          {notes.map((n, idx) => {
             const on = sel?.id === n.id;
             return (
-              <button key={n.id} type="button" className={`glass note-card${on ? " is-on" : ""}`} aria-pressed={on} onClick={() => selectNote(n.id)}>
+              <motion.button {...reveal(idx)} whileTap={{ scale: 0.98 }} key={n.id} type="button" className={`glass note-card${on ? " is-on" : ""}`} aria-pressed={on} onClick={() => selectNote(n.id)}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 500, color: "var(--text-3b)" }}>
                     <span className="dot" aria-hidden="true" style={{ background: NOTE_DOT[n.color] }} />
@@ -355,7 +357,7 @@ export function Notes() {
                 <span className="note-card-title">{n.title}</span>
                 <span className="note-card-excerpt">{excerpt(n.body_md)}</span>
                 <span style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--faint)" }}>{edited(n.updated_at)}</span>
-              </button>
+              </motion.button>
             );
           })}
         </div>

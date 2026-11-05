@@ -6,10 +6,10 @@ Built with Tauri 2 (Rust) and React 18 + TypeScript + Vite.
 
 ## Install
 
-Download `Daybook_0.2.0_amd64.deb` from the `release/` folder and install it:
+Download `Daybook_0.3.0_amd64.deb` from the `release/` folder and install it:
 
 ```bash
-sudo apt install ./release/Daybook_0.2.0_amd64.deb
+sudo apt install ./release/Daybook_0.3.0_amd64.deb
 ```
 
 Daybook then appears in the application menu. Targets Ubuntu 22.04+ and Debian 12+ (WebKitGTK 4.1).
@@ -29,7 +29,7 @@ sudo apt install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 npm install
 npm run tauri build -- --bundles deb
-sudo apt install ./src-tauri/target/release/bundle/deb/Daybook_0.2.0_amd64.deb
+sudo apt install ./src-tauri/target/release/bundle/deb/Daybook_0.3.0_amd64.deb
 ```
 
 Run the Rust tests with `cargo test --manifest-path src-tauri/Cargo.toml`.

@@ -422,7 +422,9 @@ function CommentItem({ c, onSaved }: { c: Comment; onSaved: () => void }) {
   );
 }
 
-export default function TaskApp({ id }: { id: string }) {
+export default function TaskApp({ id, onClose }: { id: string; onClose?: () => void }) {
+  const embedded = !!onClose;
+  const closeSelf = () => (onClose ? onClose() : void win.close());
   const settings = useUI((s) => s.settings);
   const projects = useUI((s) => s.projects);
   const [task, setTask] = useState<Task | null>(null);
@@ -440,7 +442,7 @@ export default function TaskApp({ id }: { id: string }) {
       if (!titleFocus.current) setTitle(t.title);
       setComments(await call<Comment[]>("list_comments", { taskId: id }));
     } catch (e) {
-      if (errorCode(e) === "not_found") void win.close();
+      if (errorCode(e) === "not_found") closeSelf();
     }
   }, [id]);
 
@@ -478,6 +480,15 @@ export default function TaskApp({ id }: { id: string }) {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  useEffect(() => {
+    if (!onClose) return;
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !document.querySelector(".popover")) onClose();
+    };
+    window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
+  }, [onClose]);
+
   const elapsed = useMemo(() => {
     if (!task) return 0;
     const extra = task.timer_started_at ? Math.max(0, Math.floor((now - Date.parse(task.timer_started_at)) / 1000)) : 0;
@@ -485,7 +496,7 @@ export default function TaskApp({ id }: { id: string }) {
   }, [task, now]);
 
   if (!task) {
-    return (
+    return embedded ? null : (
       <div className="app">
         <Blobs variant="task" />
       </div>
@@ -507,15 +518,13 @@ export default function TaskApp({ id }: { id: string }) {
     await call("add_comment", { taskId: id, bodyMd: body });
   };
 
-  return (
-    <div className="app">
-      <Blobs variant="task" />
+  const body = (
       <div className="page">
         <header className="glass task-bar" data-tauri-drag-region>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }} data-tauri-drag-region>
-            <button type="button" className="back-btn" onClick={() => void call("focus_main_window")}>
+            <button type="button" className="back-btn" onClick={() => (embedded ? closeSelf() : void call("focus_main_window"))}>
               <Icon name="arrowLeft" size={15} sw={2} />
-              Today
+              {embedded ? "Back" : "Today"}
             </button>
             <span style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--muted)" }} data-tauri-drag-region>
               TASK-{task.seq}
@@ -534,7 +543,13 @@ export default function TaskApp({ id }: { id: string }) {
               {done ? "Reopen" : "Mark done"}
             </button>
             <div className="divider-v" aria-hidden="true" data-tauri-drag-region />
-            <WindowControls />
+            {embedded ? (
+              <button type="button" className="win-btn" aria-label="Close" onClick={closeSelf}>
+                <Icon name="close" size={14} />
+              </button>
+            ) : (
+              <WindowControls />
+            )}
           </div>
         </header>
 
@@ -658,6 +673,13 @@ export default function TaskApp({ id }: { id: string }) {
           </aside>
         </div>
       </div>
+  );
+
+  if (embedded) return body;
+  return (
+    <div className="app">
+      <Blobs variant="task" />
+      {body}
     </div>
   );
 }
