@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-export type BlobVariant = "today" | "notes" | "settings" | "task";
+export type BlobVariant = "today" | "notes" | "settings" | "task" | "shots" | "editor";
 
 const radial = (rgb: string, a: number) => `radial-gradient(closest-side, rgba(${rgb},${a}), rgba(${rgb},0))`;
 const ribbon = (c1: string, a1: number, c2: string, a2: number) =>
@@ -74,6 +74,33 @@ const VARIANTS: Record<BlobVariant, CSSProperties[]> = {
       background: ribbon(SKY, 0.24, ROSE, 0.14),
       filter: "blur(30px)",
     },
+  ],
+  shots: [
+    circle({ top: -220, right: -140 }, 700, radial(SKY, 0.3)),
+    circle({ top: -160, left: -160 }, 640, radial(VIOLET, 0.28)),
+    {
+      top: "42%",
+      left: "16%",
+      width: 1000,
+      height: 300,
+      borderRadius: "50%",
+      transform: "rotate(-12deg)",
+      background: ribbon(PEACH, 0.22, ROSE, 0.16),
+      filter: "blur(32px)",
+    },
+    circle({ bottom: -220, right: "10%" }, 600, radial(MINT, 0.22)),
+  ],
+  editor: [
+    {
+      top: -240,
+      left: "10%",
+      width: 760,
+      height: 600,
+      borderRadius: "50%",
+      background: radial(VIOLET, 0.26),
+    },
+    circle({ top: "20%", right: -200 }, 640, radial(PEACH, 0.22)),
+    circle({ bottom: -240, left: -120 }, 680, radial(MINT, 0.2)),
   ],
   task: [
     {

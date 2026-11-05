@@ -3,7 +3,7 @@ import { call } from "./ipc";
 import type { ItemKind, Project, Settings } from "./types";
 import { dayKey, hexToRgb } from "./util";
 
-export type View = "today" | "upcoming" | "notes" | "calendar" | "settings";
+export type View = "today" | "upcoming" | "notes" | "shots" | "calendar" | "settings";
 export type SettingsTab = "general" | "ai" | "sync" | "shortcuts";
 export type Modal =
   | null
@@ -16,6 +16,8 @@ interface UI {
   prevView: View;
   day: string;
   selectedNoteId: string | null;
+  selectedShotId: string | null;
+  attachShotId: string | null;
   settingsTab: SettingsTab;
   modal: Modal;
   settings: Settings;
@@ -27,6 +29,8 @@ interface UI {
   closeSettings: () => void;
   setDay: (d: string) => void;
   selectNote: (id: string | null) => void;
+  selectShot: (id: string | null) => void;
+  requestAttach: (id: string | null) => void;
   setModal: (m: Modal) => void;
   touch: () => void;
   loadSettings: () => Promise<void>;
@@ -39,6 +43,8 @@ export const useUI = create<UI>((set, get) => ({
   prevView: "today",
   day: dayKey(new Date()),
   selectedNoteId: null,
+  selectedShotId: null,
+  attachShotId: null,
   settingsTab: "general",
   modal: null,
   settings: {},
@@ -58,6 +64,8 @@ export const useUI = create<UI>((set, get) => ({
   closeSettings: () => set({ view: get().prevView }),
   setDay: (day) => set({ day }),
   selectNote: (selectedNoteId) => set({ selectedNoteId }),
+  selectShot: (selectedShotId) => set({ selectedShotId }),
+  requestAttach: (attachShotId) => set({ attachShotId }),
   setModal: (modal) => set({ modal }),
   touch: () => set({ lastSaved: new Date() }),
   loadSettings: async () => {

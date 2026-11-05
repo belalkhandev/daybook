@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core";
+import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { openUrl } from "@tauri-apps/plugin-opener";
@@ -12,6 +12,40 @@ export async function call<T>(cmd: string, args?: Record<string, unknown>): Prom
     return (await mockCall(cmd, args)) as T;
   }
   return invoke<T>(cmd, args);
+}
+
+export function assetUrl(path: string): string {
+  return inTauri ? convertFileSrc(path) : path;
+}
+
+export async function callBytes(cmd: string, args?: Record<string, unknown>): Promise<ArrayBuffer> {
+  if (!inTauri && import.meta.env.DEV) {
+    const { mockCall } = await import("../dev/mock");
+    return (await mockCall(cmd, args)) as ArrayBuffer;
+  }
+  return invoke<ArrayBuffer>(cmd, args);
+}
+
+export async function callRaw<T>(cmd: string, bytes: Uint8Array, headers: Record<string, string>): Promise<T> {
+  if (!inTauri && import.meta.env.DEV) {
+    const { mockCall } = await import("../dev/mock");
+    return (await mockCall(cmd, { bytes, headers })) as T;
+  }
+  return invoke<T>(cmd, bytes, { headers });
+}
+
+export function onEvent<T>(name: string, cb: (payload: T) => void): () => void {
+  if (!inTauri) return () => undefined;
+  let off: (() => void) | undefined;
+  let dead = false;
+  void listen<T>(name, (e) => cb(e.payload)).then((u) => {
+    if (dead) u();
+    else off = u;
+  });
+  return () => {
+    dead = true;
+    off?.();
+  };
 }
 
 type Listener = (kind: string) => void;

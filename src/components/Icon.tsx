@@ -65,6 +65,8 @@ const DEFS: Record<string, Def> = {
     d: ["M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"],
     extra: <circle cx="12" cy="12" r="3" />,
   },
+  undo: { d: ["M9 14L4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"], sw: 2 },
+  redo: { d: ["M15 14l5-5-5-5M20 9H9a5 5 0 0 0 0 10h3"], sw: 2 },
   chevron: { d: ["M6 9l6 6 6-6"], sw: 2 },
   lock: { d: ["M8 11V8a4 4 0 0 1 8 0v3"], extra: <rect x="5" y="11" width="14" height="10" rx="2" /> },
   shield: { d: ["M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"] },

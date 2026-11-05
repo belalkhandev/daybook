@@ -69,6 +69,28 @@ CREATE INDEX idx_tasks_due ON tasks(due_at);
 CREATE INDEX idx_notes_updated ON notes(updated_at DESC);
 ";
 
+const SHOTS: &str = "
+CREATE TABLE shots (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  file TEXT NOT NULL,
+  thumb TEXT NOT NULL,
+  taken_at TEXT NOT NULL,
+  app TEXT NOT NULL DEFAULT 'Desktop',
+  tag TEXT,
+  width INTEGER NOT NULL,
+  height INTEGER NOT NULL,
+  bytes INTEGER NOT NULL,
+  ocr_text TEXT NOT NULL DEFAULT '',
+  task_id TEXT REFERENCES tasks(id) ON DELETE SET NULL,
+  note_id TEXT REFERENCES notes(id) ON DELETE SET NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX idx_shots_taken ON shots(taken_at DESC);
+";
+
 const DEFAULT_PROJECTS: [(&str, &str); 4] = [
     ("Daybook App", "#6366F1"),
     ("Client work", "#F59E0B"),
@@ -97,7 +119,7 @@ impl Db {
     fn init(mut conn: Connection) -> AppResult<Self> {
         conn.query_row("PRAGMA journal_mode = WAL", [], |r| r.get::<_, String>(0))?;
         conn.pragma_update(None, "foreign_keys", "ON")?;
-        Migrations::new(vec![M::up(SCHEMA)])
+        Migrations::new(vec![M::up(SCHEMA), M::up(SHOTS)])
             .to_latest(&mut conn)
             .map_err(|e| AppError::Other(e.to_string()))?;
         seed(&conn)?;

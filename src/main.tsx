@@ -12,12 +12,30 @@ import "./styles/notes.css";
 import "./styles/modals.css";
 import "./styles/settings.css";
 import "./styles/task.css";
+import "./styles/shots.css";
+import "./styles/capture.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import TaskApp from "./views/TaskApp";
+import { CaptureOverlay } from "./views/CaptureOverlay";
+import { CaptureToast } from "./views/CaptureToast";
+import { ShotEditor } from "./views/ShotEditor";
 
 const params = new URLSearchParams(window.location.search);
-const taskId = params.get("view") === "task" ? params.get("id") : null;
+const view = params.get("view");
+const id = params.get("id") ?? "";
 
-createRoot(document.getElementById("root") as HTMLElement).render(<StrictMode>{taskId ? <TaskApp id={taskId} /> : <App />}</StrictMode>);
+function Root() {
+  if (view === "task" && id) return <TaskApp id={id} />;
+  if (view === "shot" && id) return <ShotEditor id={id} />;
+  if (view === "capture") return <CaptureOverlay />;
+  if (view === "toast" && id) return <CaptureToast id={id} ocr={params.get("ocr") === "1"} copied={params.get("copied") === "1"} />;
+  return <App />;
+}
+
+createRoot(document.getElementById("root") as HTMLElement).render(
+  <StrictMode>
+    <Root />
+  </StrictMode>,
+);

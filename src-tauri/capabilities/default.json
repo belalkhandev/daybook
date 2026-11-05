@@ -2,7 +2,7 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Daybook windows",
-  "windows": ["main", "task-*"],
+  "windows": ["main", "task-*", "capture", "shot-*", "toast"],
   "permissions": [
     "core:default",
     "core:window:allow-minimize",

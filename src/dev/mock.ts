@@ -1,5 +1,6 @@
 import type { Comment, Note, Project, Task } from "../lib/types";
 import { toIso } from "../lib/util";
+import { art } from "./shotart";
 
 type Args = Record<string, unknown> | undefined;
 const subs = new Set<(k: string) => void>();
@@ -85,6 +86,42 @@ const notes: Note[] = [
 const comments: Comment[] = [
   { id: "c1", task_id: rel.id, body_md: "Draft is in `docs/release/v0.4.md`. Still need **screenshots** for the notes page.", created_at: todayAt(10, 12), updated_at: todayAt(10, 12) },
   { id: "c2", task_id: rel.id, body_md: "Flatpak build passed on **Fedora** and **Ubuntu**. Run `cargo test --release` once more before tagging.", created_at: todayAt(12, 40), updated_at: todayAt(12, 40) },
+];
+
+const daysAgo = (d: number, h: number, m: number) => {
+  const x = new Date();
+  x.setDate(x.getDate() - d);
+  x.setHours(h, m, 0, 0);
+  return toIso(x);
+};
+
+const mkShot = (title: string, kind: string, d: number, h: number, m: number, app: string, tag: string | null, res: [number, number], kb: number, ocr: string, i: number, task?: Task) => ({
+  id: "s" + (i + 1),
+  title,
+  file: "/x/" + (i + 1) + ".png",
+  thumb: art(kind, i),
+  taken_at: daysAgo(d, h, m),
+  app,
+  tag,
+  width: res[0],
+  height: res[1],
+  bytes: kb * 1024,
+  ocr_text: ocr,
+  task: task ? { id: task.id, label: "TASK-" + task.seq + " \u00b7 " + task.title } : null,
+  note: null as { id: string; label: string } | null,
+});
+
+const shots = [
+  mkShot("Sync bug in store.rs", "code", 0, 14, 2, "Code", "bug", [1037, 648], 412, "fn sync_store(&mut self) -> Result<()> { let tx = self.conn.transaction()?; ... }", 0, rel),
+  mkShot("Flathub app page", "web", 0, 12, 40, "Firefox", "design", [1920, 1080], 680, "Daybook, Daily tasks and notes. Install on Flathub.", 1),
+  mkShot("cargo test output", "terminal", 0, 10, 15, "Terminal", "bug", [1280, 720], 210, "test result: FAILED. 41 passed; 1 failed; finished in 3.42s", 2),
+  mkShot("Usage dashboard", "chart", 0, 9, 31, "Firefox", null, [1920, 1080], 540, "Weekly active users, Sessions, Avg. focus time", 3),
+  mkShot("Note card variants", "design", 1, 18, 20, "Figma", "design", [1600, 1000], 388, "Sprint ideas, Groceries, Design sync", 4),
+  mkShot("Electricity bill receipt", "receipt", 1, 16, 5, "Document Viewer", "receipt", [1240, 1754], 296, "Account 4471-09 Units 214 Total due 2,340 BDT", 5),
+  mkShot("Keyring error dialog", "code", 1, 11, 47, "Code", "bug", [1037, 648], 402, "Error: NoStorageAccess(PlatformFailure)", 6),
+  mkShot("Tauri docs, windows", "web", 3, 21, 10, "Firefox", null, [1920, 1080], 612, "WebviewWindowBuilder::new(app, label, url)", 7),
+  mkShot("Logo explorations", "design", 3, 15, 0, "Figma", "design", [1600, 1000], 355, "Daybook logo v3 gradient", 8),
+  mkShot("Domain renewal", "receipt", 36, 19, 44, "Firefox", "receipt", [1240, 1754], 240, "daybook.app 1 year Paid", 9),
 ];
 
 let settings: Record<string, string> = {};
@@ -318,6 +355,61 @@ export async function mockCall(cmd: string, a: Args): Promise<unknown> {
       return "### Improved\n\n- [ ] first item\n- [ ] second item";
     case "ai_test_connection":
       await wait(800);
+      return null;
+    case "list_shots": {
+      const q = String(args.query ?? "").toLowerCase();
+      return shots.filter((x) => !q || (x.title + " " + x.ocr_text + " " + x.app + " " + (x.tag ?? "")).toLowerCase().includes(q)).sort((a, b) => b.taken_at.localeCompare(a.taken_at));
+    }
+    case "get_shot":
+      return shots.find((x) => x.id === args.id) ?? shots[0];
+    case "update_shot": {
+      const x = shots.find((y) => y.id === args.id);
+      if (x) {
+        const p = args.patch as Record<string, any>;
+        if ("title" in p) x.title = p.title;
+        if ("tag" in p) x.tag = p.tag;
+        if ("task_id" in p) {
+          const t = tasks.find((z) => z.id === p.task_id);
+          x.task = t ? { id: t.id, label: "TASK-" + t.seq + " \u00b7 " + t.title } : null;
+        }
+        if ("note_id" in p) {
+          const n = notes.find((z) => z.id === p.note_id);
+          x.note = n ? { id: n.id, label: n.title } : null;
+          if (n) x.task = null;
+        }
+      }
+      emit("shots");
+      return x;
+    }
+    case "delete_shot":
+      shots.splice(shots.findIndex((x) => x.id === args.id), 1);
+      emit("shots");
+      return null;
+    case "read_shot_bytes": {
+      const x = shots.find((y) => y.id === args.id) ?? shots[0];
+      const img = new Image();
+      img.src = x.thumb;
+      await img.decode();
+      const cv = document.createElement("canvas");
+      cv.width = 1600;
+      cv.height = 1000;
+      cv.getContext("2d")?.drawImage(img, 0, 0, 1600, 1000);
+      const blob: Blob = await new Promise((res) => cv.toBlob((b) => res(b as Blob), "image/png"));
+      return blob.arrayBuffer();
+    }
+    case "capture_info":
+      return { width: 1920, height: 1080, mode: "area", src: art("desktop", 0) };
+    case "save_shot_image":
+    case "copy_png_bytes":
+    case "copy_shot_image":
+    case "reveal_shot":
+    case "request_attach":
+    case "focus_main_window":
+    case "cancel_capture":
+    case "start_capture":
+      return null;
+    case "open_shot_editor":
+      window.open(`/?view=shot&id=${args.id}`, "_blank");
       return null;
     case "open_task_window":
       window.open(`/?view=task&id=${args.id}`, "_blank");

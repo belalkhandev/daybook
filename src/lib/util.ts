@@ -223,3 +223,29 @@ export function hexToRgb(hex: string): [number, number, number] {
   const n = parseInt(hex.replace("#", ""), 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
+
+export function shotDayLabel(day: string, now = new Date()): string {
+  const d = parseDayKey(day);
+  if (day === dayKey(now)) return "Today";
+  if (day === dayKey(addDays(now, -1))) return "Yesterday";
+  const wd = d.toLocaleDateString("en-GB", { weekday: "long" });
+  const month = d.toLocaleDateString("en-GB", { month: "long" });
+  return `${wd}, ${d.getDate()} ${month}${d.getFullYear() === now.getFullYear() ? "" : " " + d.getFullYear()}`;
+}
+
+export function shotShortDay(day: string, now = new Date()): string {
+  if (day === dayKey(now)) return "Today";
+  if (day === dayKey(addDays(now, -1))) return "Yesterday";
+  const d = parseDayKey(day);
+  return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" }).replace(",", "");
+}
+
+export function monthLabel(day: string): string {
+  const d = parseDayKey(day + "-01");
+  return `${d.toLocaleDateString("en-GB", { month: "long" })} ${d.getFullYear()}`;
+}
+
+export function fmtBytes(n: number): string {
+  if (n >= 1024 * 1024) return `${(n / 1024 / 1024).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(n / 1024))} KB`;
+}

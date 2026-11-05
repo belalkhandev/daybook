@@ -121,3 +121,40 @@ export interface QuickAddResult {
   kind: ItemKind;
   id: string;
 }
+
+export interface ShotLink {
+  id: string;
+  label: string;
+}
+
+export interface Shot {
+  id: string;
+  title: string;
+  file: string;
+  thumb: string;
+  taken_at: string;
+  app: string;
+  tag: string | null;
+  width: number;
+  height: number;
+  bytes: number;
+  ocr_text: string;
+  task: ShotLink | null;
+  note: ShotLink | null;
+}
+
+export interface ShotPatch {
+  title?: string;
+  tag?: string | null;
+  task_id?: string | null;
+  note_id?: string | null;
+}
+
+export interface CaptureInfo {
+  width: number;
+  height: number;
+  mode: string;
+  src: string;
+}
+
+export type CaptureMode = "area" | "window" | "screen";

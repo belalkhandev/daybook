@@ -467,7 +467,7 @@ export default function TaskApp({ id }: { id: string }) {
     const onKey = (e: KeyboardEvent) => {
       if (e.code !== "Space" || e.ctrlKey || e.metaKey || e.altKey) return;
       const el = e.target as HTMLElement;
-      if (el.closest("input, textarea, select, button, [contenteditable='true']")) return;
+      if (el.closest?.("input, textarea, select, button, [contenteditable='true']")) return;
       e.preventDefault();
       setTask((t) => {
         if (t) void call(t.timer_started_at ? "timer_pause" : "timer_start", { id: t.id });

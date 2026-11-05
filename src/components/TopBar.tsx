@@ -6,6 +6,7 @@ const ITEMS: { view: View; label: string }[] = [
   { view: "today", label: "Today" },
   { view: "upcoming", label: "Upcoming" },
   { view: "notes", label: "Notes" },
+  { view: "shots", label: "Shots" },
   { view: "calendar", label: "Calendar" },
 ];
 

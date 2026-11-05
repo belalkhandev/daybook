@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Blobs } from "./components/Blobs";
 import { TopBar } from "./components/TopBar";
-import { onDataChanged } from "./lib/ipc";
+import { call, onDataChanged, onEvent } from "./lib/ipc";
+import type { View } from "./lib/store";
 import { applyAppearance, useUI } from "./lib/store";
 import { AiModal } from "./views/AiModal";
 import { ComingSoon } from "./views/ComingSoon";
 import { Notes } from "./views/Notes";
+import { Shots } from "./views/Shots";
 import { QuickAddModal } from "./views/QuickAddModal";
 import { SearchModal } from "./views/SearchModal";
 import { SettingsView } from "./views/SettingsView";
@@ -31,7 +33,26 @@ export default function App() {
   useEffect(() => applyAppearance(settings), [settings]);
 
   useEffect(() => {
+    const offView = onEvent<string>("go-view", (v) => useUI.getState().go(v as View));
+    const offAttach = onEvent<string>("shot-attach", (id) => {
+      const s = useUI.getState();
+      s.selectShot(id);
+      s.requestAttach(id);
+      s.go("shots");
+    });
+    return () => {
+      offView();
+      offAttach();
+    };
+  }, []);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (e.key === "PrintScreen") {
+        e.preventDefault();
+        void call("start_capture", { mode: e.shiftKey ? "window" : e.ctrlKey ? "screen" : "area" }).catch(() => undefined);
+        return;
+      }
       if (!e.ctrlKey && !e.metaKey) return;
       const s = useUI.getState();
       const k = e.key.toLowerCase();
@@ -44,16 +65,16 @@ export default function App() {
       } else if (k === "n") {
         e.preventDefault();
         s.setModal({ type: "quick", kind: "task" });
-      } else if (["1", "2", "3", "4"].includes(k)) {
+      } else if (["1", "2", "3", "4", "5"].includes(k)) {
         e.preventDefault();
-        s.go((["today", "upcoming", "notes", "calendar"] as const)[Number(k) - 1]);
+        s.go((["today", "upcoming", "notes", "shots", "calendar"] as const)[Number(k) - 1]);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const blobs = view === "notes" ? "notes" : view === "settings" ? "settings" : "today";
+  const blobs = view === "notes" ? "notes" : view === "settings" ? "settings" : view === "shots" ? "shots" : "today";
 
   return (
     <div className="app">
@@ -62,6 +83,7 @@ export default function App() {
         <TopBar />
         {loaded && view === "today" && <Today />}
         {loaded && view === "notes" && <Notes />}
+        {loaded && view === "shots" && <Shots />}
         {view === "upcoming" && <ComingSoon title="Upcoming" />}
         {view === "calendar" && <ComingSoon title="Calendar" />}
         {loaded && view === "settings" && <SettingsView />}
