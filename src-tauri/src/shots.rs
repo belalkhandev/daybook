@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use chrono::Local;
-use image::{imageops::FilterType, DynamicImage, GenericImageView, ImageFormat};
+use image::{imageops::FilterType, DynamicImage, GenericImageView};
 use rusqlite::{params, Connection};
 use serde::{Deserialize, Deserializer, Serialize};
 use tauri::{AppHandle, State};
@@ -44,7 +44,7 @@ impl ShotDirs {
         let pictures = dirs::picture_dir()
             .or_else(|| dirs::home_dir().map(|h| h.join("Pictures")))
             .unwrap_or_else(|| PathBuf::from("."))
-            .join("Daybook");
+            .join("Trove");
         let thumbs = crate::db::data_dir().join("thumbs");
         ShotDirs { pictures, thumbs }
     }
@@ -91,8 +91,25 @@ pub fn crop(img: &DynamicImage, r: Rect) -> DynamicImage {
 }
 
 pub fn write_png(img: &DynamicImage, path: &Path) -> AppResult<i64> {
-    img.save_with_format(path, ImageFormat::Png).map_err(img_err)?;
+    use image::codecs::png::{CompressionType, FilterType as PngFilter, PngEncoder};
+    let file = std::io::BufWriter::new(std::fs::File::create(path).map_err(io)?);
+    let encoder = PngEncoder::new_with_quality(file, CompressionType::Fast, PngFilter::Sub);
+    img.write_with_encoder(encoder).map_err(img_err)?;
     Ok(std::fs::metadata(path).map_err(io)?.len() as i64)
+}
+
+pub fn set_ocr(conn: &Connection, id: &str, text: &str) -> AppResult<()> {
+    let current = get(conn, id)?;
+    let title = if current.title.starts_with("Screenshot ") && !text.trim().is_empty() {
+        default_title(text, Local::now())
+    } else {
+        current.title
+    };
+    conn.execute(
+        "UPDATE shots SET ocr_text = ?1, title = ?2, updated_at = ?3 WHERE id = ?4",
+        params![text, title, now_iso(), id],
+    )?;
+    Ok(())
 }
 
 pub fn write_thumb(img: &DynamicImage, path: &Path) -> AppResult<()> {
@@ -102,7 +119,7 @@ pub fn write_thumb(img: &DynamicImage, path: &Path) -> AppResult<()> {
     } else {
         img.clone()
     };
-    t.save_with_format(path, ImageFormat::Png).map_err(img_err)
+    write_png(&t, path).map(|_| ())
 }
 
 pub fn default_title(ocr: &str, now: chrono::DateTime<Local>) -> String {
@@ -209,7 +226,7 @@ pub fn create(conn: &Connection, dirs: &ShotDirs, img: &DynamicImage, meta: NewS
         .filter(|t| !t.trim().is_empty())
         .unwrap_or_else(|| default_title(&meta.ocr, now));
     let id = new_id();
-    let file = unique_name(&dirs.pictures, &format!("Daybook {}", now.format("%Y-%m-%d %H.%M.%S")));
+    let file = unique_name(&dirs.pictures, &format!("Trove {}", now.format("%Y-%m-%d %H.%M.%S")));
     let bytes = write_png(img, &file)?;
     let thumb = dirs.thumbs.join(format!("{id}.png"));
     write_thumb(img, &thumb)?;
@@ -393,11 +410,12 @@ pub fn reveal_shot(db: State<Db>, id: String) -> AppResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use image::ImageFormat;
     use crate::db::Db;
     use image::{ImageBuffer, Rgba};
 
     fn dirs(tag: &str) -> ShotDirs {
-        let base = std::env::temp_dir().join(format!("daybook-test-{}-{}", tag, new_id()));
+        let base = std::env::temp_dir().join(format!("trove-test-{}-{}", tag, new_id()));
         ShotDirs {
             pictures: base.join("pics"),
             thumbs: base.join("thumbs"),

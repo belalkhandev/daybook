@@ -27,16 +27,11 @@ export interface Snapshot {
   marks: Mark[];
 }
 
-const STROKES = [4, 7, 12];
-const FONTS = [22, 30, 42];
+const STROKES = [3, 6, 11, 18];
+const FONTS = [20, 28, 40, 56];
 
 export const strokeWidth = (size: number, iw: number) => Math.max(2, STROKES[size] * (iw / 1600));
 export const fontSize = (size: number, iw: number) => Math.max(12, Math.round(FONTS[size] * (iw / 1600)));
-
-function rgba(hex: string, a: number) {
-  const n = parseInt(hex.replace("#", ""), 16);
-  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
-}
 
 function isLight(hex: string) {
   const n = parseInt(hex.replace("#", ""), 16);
@@ -88,11 +83,6 @@ export function drawMark(ctx: CanvasRenderingContext2D, m: Mark, base: HTMLCanva
     ctx.lineWidth = sw;
     roundRect(ctx, b.x, b.y, b.w, b.h, 12 * f);
     ctx.stroke();
-  } else if (m.t === "highlight") {
-    const b = norm(m);
-    ctx.fillStyle = rgba(m.color, 0.45);
-    roundRect(ctx, b.x, b.y, b.w, b.h, 6 * f);
-    ctx.fill();
   } else if (m.t === "blur") {
     const b = norm(m);
     if (b.w > 1 && b.h > 1) pixelate(ctx, base, b);
@@ -109,10 +99,12 @@ export function drawMark(ctx: CanvasRenderingContext2D, m: Mark, base: HTMLCanva
     ctx.moveTo(m.x2, m.y2);
     ctx.lineTo(m.x2 - head * Math.cos(ang + 0.45), m.y2 - head * Math.sin(ang + 0.45));
     ctx.stroke();
-  } else if (m.t === "pen") {
+  } else if (m.t === "pen" || m.t === "highlight") {
     if (m.pts.length > 1) {
+      const marker = m.t === "highlight";
       ctx.strokeStyle = m.color;
-      ctx.lineWidth = sw;
+      ctx.globalAlpha = marker ? 0.42 : 1;
+      ctx.lineWidth = marker ? sw * 3.4 : sw;
       ctx.beginPath();
       ctx.moveTo(m.pts[0][0], m.pts[0][1]);
       for (const p of m.pts.slice(1)) ctx.lineTo(p[0], p[1]);
@@ -142,11 +134,127 @@ export function render(ctx: CanvasRenderingContext2D, snap: Snapshot, extra: Mar
   for (const m of extra) drawMark(ctx, m, base);
 }
 
+const viewCache = new WeakMap<HTMLCanvasElement, { w: number; c: HTMLCanvasElement }>();
+
+export function scaledBase(base: HTMLCanvasElement, targetW: number): HTMLCanvasElement {
+  if (targetW >= base.width * 0.75) return base;
+  const hit = viewCache.get(base);
+  if (hit && hit.w === targetW) return hit.c;
+  let cur = base;
+  while (cur.width / 2 >= targetW) {
+    const next = document.createElement("canvas");
+    next.width = Math.max(1, Math.round(cur.width / 2));
+    next.height = Math.max(1, Math.round(cur.height / 2));
+    const ctx = next.getContext("2d");
+    if (!ctx) break;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(cur, 0, 0, next.width, next.height);
+    cur = next;
+  }
+  viewCache.set(base, { w: targetW, c: cur });
+  return cur;
+}
+
+export function renderView(ctx: CanvasRenderingContext2D, snap: Snapshot, extra: Mark[], k: number) {
+  const { base, marks } = snap;
+  const cw = ctx.canvas.width;
+  const ch = ctx.canvas.height;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, cw, ch);
+  ctx.imageSmoothingEnabled = k < 2;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(scaledBase(base, cw), 0, 0, cw, ch);
+  ctx.setTransform(k, 0, 0, k, 0, 0);
+  for (const m of marks) drawMark(ctx, m, base);
+  for (const m of extra) drawMark(ctx, m, base);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+
+export function resizeCrop(o: Box, corner: string, dx: number, dy: number, ratio: number | null, iw: number, ih: number): Box {
+  const MIN = 8;
+  const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+  if (corner === "move") return { ...o, x: clamp(o.x + dx, 0, iw - o.w), y: clamp(o.y + dy, 0, ih - o.h) };
+  const L = corner.includes("l");
+  const R = corner.includes("r");
+  const T = corner.includes("t");
+  const B = corner.includes("b");
+  let x1 = o.x;
+  let y1 = o.y;
+  let x2 = o.x + o.w;
+  let y2 = o.y + o.h;
+  if (L) x1 = clamp(o.x + dx, 0, x2 - MIN);
+  if (R) x2 = clamp(o.x + o.w + dx, x1 + MIN, iw);
+  if (T) y1 = clamp(o.y + dy, 0, y2 - MIN);
+  if (B) y2 = clamp(o.y + o.h + dy, y1 + MIN, ih);
+  if (ratio) {
+    const horiz = L || R;
+    const vert = T || B;
+    if (horiz && vert) {
+      let w = x2 - x1;
+      let h = w / ratio;
+      const hMax = T ? y2 : ih - y1;
+      if (h > hMax) {
+        h = hMax;
+        w = h * ratio;
+      }
+      if (L) x1 = x2 - w;
+      else x2 = x1 + w;
+      if (T) y1 = y2 - h;
+      else y2 = y1 + h;
+    } else if (horiz) {
+      let w = x2 - x1;
+      let h = w / ratio;
+      if (h > ih) {
+        h = ih;
+        w = h * ratio;
+        if (L) x1 = x2 - w;
+        else x2 = x1 + w;
+      }
+      const cy = o.y + o.h / 2;
+      y1 = clamp(cy - h / 2, 0, ih - h);
+      y2 = y1 + h;
+    } else {
+      let h = y2 - y1;
+      let w = h * ratio;
+      if (w > iw) {
+        w = iw;
+        h = w / ratio;
+        if (T) y1 = y2 - h;
+        else y2 = y1 + h;
+      }
+      const cx = o.x + o.w / 2;
+      x1 = clamp(cx - w / 2, 0, iw - w);
+      x2 = x1 + w;
+    }
+  }
+  return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
+}
+
+export function newCrop(sx: number, sy: number, px: number, py: number, ratio: number | null, iw: number, ih: number): Box {
+  const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+  let cx = clamp(px, 0, iw);
+  let cy = clamp(py, 0, ih);
+  if (ratio) {
+    let w = Math.abs(cx - sx);
+    let h = w / ratio;
+    const dirY = cy >= sy ? 1 : -1;
+    const room = dirY > 0 ? ih - sy : sy;
+    if (h > room) {
+      h = room;
+      w = h * ratio;
+    }
+    cx = sx + (cx >= sx ? w : -w);
+    cy = sy + dirY * h;
+  }
+  return { x: Math.min(sx, cx), y: Math.min(sy, cy), w: Math.abs(cx - sx), h: Math.abs(cy - sy) };
+}
+
 let measureCtx: CanvasRenderingContext2D | null = null;
 
 export function bounds(m: Mark, iw: number): Box {
   if (m.t === "arrow") return norm({ x: m.x, y: m.y, w: m.x2 - m.x, h: m.y2 - m.y });
-  if (m.t === "pen") {
+  if (m.t === "pen" || m.t === "highlight") {
     const xs = m.pts.map((p) => p[0]);
     const ys = m.pts.map((p) => p[1]);
     const x = Math.min(...xs);
@@ -173,7 +281,7 @@ function distToSegment(px: number, py: number, ax: number, ay: number, bx: numbe
 
 export function hit(m: Mark, x: number, y: number, tol: number, iw: number): boolean {
   if (m.t === "arrow") return distToSegment(x, y, m.x, m.y, m.x2, m.y2) <= tol + strokeWidth(m.size, iw);
-  if (m.t === "pen") {
+  if (m.t === "pen" || m.t === "highlight") {
     for (let i = 1; i < m.pts.length; i++) {
       if (distToSegment(x, y, m.pts[i - 1][0], m.pts[i - 1][1], m.pts[i][0], m.pts[i][1]) <= tol + strokeWidth(m.size, iw)) return true;
     }

@@ -362,7 +362,7 @@ export function Shots() {
     <>
       <section style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 20 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <span className="eyebrow">{all} screenshots · ~/Pictures/Daybook</span>
+          <span className="eyebrow">{all} screenshots · ~/Pictures/Trove</span>
           <h1 className="h1">Shots</h1>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>

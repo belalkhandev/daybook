@@ -18,7 +18,9 @@ export function useOutside(ref: React.RefObject<HTMLElement | null>, onClose: ()
   useEffect(() => {
     if (!active) return;
     const down = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) cb.current();
+      const t = e.target as Element;
+      if (t.closest?.("[data-picker-popup]")) return;
+      if (ref.current && !ref.current.contains(t)) cb.current();
     };
     const key = (e: KeyboardEvent) => {
       if (e.key === "Escape") cb.current();

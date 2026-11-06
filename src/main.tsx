@@ -14,6 +14,7 @@ import "./styles/settings.css";
 import "./styles/task.css";
 import "./styles/shots.css";
 import "./styles/capture.css";
+import "./styles/calendar.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
@@ -29,8 +30,8 @@ const id = params.get("id") ?? "";
 function Root() {
   if (view === "task" && id) return <TaskApp id={id} />;
   if (view === "shot" && id) return <ShotEditor id={id} />;
-  if (view === "capture") return <CaptureOverlay />;
-  if (view === "toast" && id) return <CaptureToast id={id} ocr={params.get("ocr") === "1"} copied={params.get("copied") === "1"} />;
+  if (view === "capture") return <CaptureOverlay index={Number(params.get("m") ?? 0)} />;
+  if (view === "toast" && id) return <CaptureToast id={id} copied={params.get("copied") === "1"} />;
   return <App />;
 }
 

@@ -17,7 +17,7 @@ const todayAt = (h: number, m: number) => {
 const ago = (mins: number) => toIso(new Date(Date.now() - mins * 60000));
 
 const projects: Project[] = [
-  { id: "p1", name: "Daybook App", color: "#6366F1", sort: 0 },
+  { id: "p1", name: "Trove App", color: "#6366F1", sort: 0 },
   { id: "p2", name: "Client work", color: "#F59E0B", sort: 1 },
   { id: "p3", name: "Website", color: "#EC4899", sort: 2 },
   { id: "p4", name: "Personal", color: "#10B981", sort: 3 },
@@ -113,15 +113,15 @@ const mkShot = (title: string, kind: string, d: number, h: number, m: number, ap
 
 const shots = [
   mkShot("Sync bug in store.rs", "code", 0, 14, 2, "Code", "bug", [1037, 648], 412, "fn sync_store(&mut self) -> Result<()> { let tx = self.conn.transaction()?; ... }", 0, rel),
-  mkShot("Flathub app page", "web", 0, 12, 40, "Firefox", "design", [1920, 1080], 680, "Daybook, Daily tasks and notes. Install on Flathub.", 1),
+  mkShot("Flathub app page", "web", 0, 12, 40, "Firefox", "design", [1920, 1080], 680, "Trove, Daily tasks and notes. Install on Flathub.", 1),
   mkShot("cargo test output", "terminal", 0, 10, 15, "Terminal", "bug", [1280, 720], 210, "test result: FAILED. 41 passed; 1 failed; finished in 3.42s", 2),
   mkShot("Usage dashboard", "chart", 0, 9, 31, "Firefox", null, [1920, 1080], 540, "Weekly active users, Sessions, Avg. focus time", 3),
   mkShot("Note card variants", "design", 1, 18, 20, "Figma", "design", [1600, 1000], 388, "Sprint ideas, Groceries, Design sync", 4),
   mkShot("Electricity bill receipt", "receipt", 1, 16, 5, "Document Viewer", "receipt", [1240, 1754], 296, "Account 4471-09 Units 214 Total due 2,340 BDT", 5),
   mkShot("Keyring error dialog", "code", 1, 11, 47, "Code", "bug", [1037, 648], 402, "Error: NoStorageAccess(PlatformFailure)", 6),
   mkShot("Tauri docs, windows", "web", 3, 21, 10, "Firefox", null, [1920, 1080], 612, "WebviewWindowBuilder::new(app, label, url)", 7),
-  mkShot("Logo explorations", "design", 3, 15, 0, "Figma", "design", [1600, 1000], 355, "Daybook logo v3 gradient", 8),
-  mkShot("Domain renewal", "receipt", 36, 19, 44, "Firefox", "receipt", [1240, 1754], 240, "daybook.app 1 year Paid", 9),
+  mkShot("Logo explorations", "design", 3, 15, 0, "Figma", "design", [1600, 1000], 355, "Trove logo v3 gradient", 8),
+  mkShot("Domain renewal", "receipt", 36, 19, 44, "Firefox", "receipt", [1240, 1754], 240, "trove.app 1 year Paid", 9),
 ];
 
 let settings: Record<string, string> = {};
@@ -190,7 +190,7 @@ function dayRange(day: string) {
 const sample = {
   task: {
     title: "Write release notes for v0.4",
-    project: "Daybook App",
+    project: "Trove App",
     priority: "high",
     due_at: todayAt(18, 0),
     target_minutes: 120,
@@ -219,6 +219,11 @@ export async function mockCall(cmd: string, a: Args): Promise<unknown> {
       return ["dev", "work", "home", "health", "personal", "release"];
     case "list_tasks": {
       const [s, e] = dayRange(args.day);
+      return tasks.filter((t) => t.due_at && Date.parse(t.due_at) >= s && Date.parse(t.due_at) < e).sort((x, y) => (x.due_at as string).localeCompare(y.due_at as string));
+    }
+    case "list_upcoming": {
+      const [s] = dayRange(args.from);
+      const e = s + Number(args.days) * 86400000;
       return tasks.filter((t) => t.due_at && Date.parse(t.due_at) >= s && Date.parse(t.due_at) < e).sort((x, y) => (x.due_at as string).localeCompare(y.due_at as string));
     }
     case "list_week_counts": {
@@ -398,13 +403,16 @@ export async function mockCall(cmd: string, a: Args): Promise<unknown> {
       return blob.arrayBuffer();
     }
     case "capture_info":
-      return { width: 1920, height: 1080, mode: "area", src: art("desktop", 0) };
+      return { width: 4480, height: 1800, mode: "area", src: art("desktop", 0), monitor: { x: 1920, y: 0, w: 2560, h: 1440 }, index: 1, count: 2, primary: 1, remembered: null };
     case "save_shot_image":
     case "copy_png_bytes":
     case "copy_shot_image":
     case "reveal_shot":
     case "request_attach":
     case "focus_main_window":
+    case "overlay_ready":
+    case "open_capture_settings":
+    case "finish_capture":
     case "cancel_capture":
     case "start_capture":
       return null;

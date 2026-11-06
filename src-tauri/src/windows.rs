@@ -15,7 +15,7 @@ pub async fn open_task_window(app: AppHandle, id: String) -> AppResult<()> {
         return Ok(());
     }
     WebviewWindowBuilder::new(&app, &label, WebviewUrl::App(format!("index.html?view=task&id={id}").into()))
-        .title("Daybook")
+        .title("Trove")
         .inner_size(1280.0, 860.0)
         .min_inner_size(900.0, 600.0)
         .decorations(false)
@@ -37,7 +37,7 @@ pub fn open_shot_editor_inner(app: &AppHandle, id: &str) -> AppResult<()> {
         return Ok(());
     }
     WebviewWindowBuilder::new(app, &label, WebviewUrl::App(format!("index.html?view=shot&id={id}").into()))
-        .title("Daybook")
+        .title("Trove")
         .inner_size(1280.0, 860.0)
         .min_inner_size(900.0, 600.0)
         .decorations(false)

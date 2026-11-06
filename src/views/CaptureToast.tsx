@@ -1,18 +1,20 @@
 import { useEffect, useRef, useState } from "react";
+import { useDataChanged } from "../lib/hooks";
 import { assetUrl, call, win } from "../lib/ipc";
 import { applyAppearance, useUI } from "../lib/store";
 import type { Shot } from "../lib/types";
 
 interface Props {
   id: string;
-  ocr: boolean;
   copied: boolean;
 }
 
-export function CaptureToast({ id, ocr, copied }: Props) {
+export function CaptureToast({ id, copied }: Props) {
   const [shot, setShot] = useState<Shot | null>(null);
   const [note, setNote] = useState("");
   const hover = useRef(false);
+
+  useDataChanged(["shots"], () => void call<Shot>("get_shot", { id }).then(setShot));
 
   useEffect(() => {
     void useUI.getState().loadSettings().then(() => applyAppearance(useUI.getState().settings));
@@ -30,7 +32,7 @@ export function CaptureToast({ id, ocr, copied }: Props) {
 
   if (!shot) return <div className="toast-root" />;
 
-  const status = `${copied ? "Copied to clipboard" : "Saved"} · ${ocr ? "text found" : "no text found"}`;
+  const status = `${copied ? "Copied to clipboard" : "Saved"}${shot.ocr_text ? " · text found" : ""}`;
 
   const copyText = async () => {
     try {

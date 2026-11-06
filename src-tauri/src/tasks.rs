@@ -330,6 +330,18 @@ pub fn list_tasks(db: State<Db>, day: String) -> AppResult<Vec<Task>> {
 }
 
 #[tauri::command]
+pub fn list_upcoming(db: State<Db>, from: String, days: i64) -> AppResult<Vec<Task>> {
+    let start = parse_day(&from)?;
+    let (s, _) = day_bounds(start);
+    let (e, _) = day_bounds(start + Duration::days(days.clamp(1, 90)));
+    query(
+        &db.conn(),
+        "WHERE t.due_at >= ?1 AND t.due_at < ?2 ORDER BY t.due_at, t.seq",
+        &[&s, &e],
+    )
+}
+
+#[tauri::command]
 pub fn list_week_counts(db: State<Db>, week_start: String) -> AppResult<Vec<DayCount>> {
     let start = parse_day(&week_start)?;
     let conn = db.conn();

@@ -280,7 +280,7 @@ mod tests {
     use super::*;
 
     fn projects() -> Vec<Project> {
-        [("a", "Daybook App"), ("b", "Client work"), ("c", "Website"), ("d", "Personal")]
+        [("a", "Trove App"), ("b", "Client work"), ("c", "Website"), ("d", "Personal")]
             .iter()
             .enumerate()
             .map(|(i, (id, name))| Project {

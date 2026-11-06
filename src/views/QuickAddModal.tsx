@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../components/Icon";
+import { DatePicker, TimePicker } from "../components/Picker";
+import { Select } from "../components/Select";
 import { Modal } from "../components/Modal";
 import { Switch } from "../components/Switch";
 import { call, errorMessage } from "../lib/ipc";
@@ -57,7 +59,6 @@ export function QuickAddModal({ initial }: { initial: ItemKind }) {
   }, [projects, projectId]);
   useEffect(() => nameRef.current?.focus(), [kind]);
 
-  const project = projects.find((p) => p.id === projectId);
   const close = () => setModal(null);
   const allTags = useMemo(() => Array.from(new Set([...tagList, ...tags])), [tagList, tags]);
 
@@ -170,12 +171,8 @@ export function QuickAddModal({ initial }: { initial: ItemKind }) {
                 </button>
               ))}
             </div>
-            {due === "pick" && <input type="date" className="input-sm" aria-label="Date" value={pickedDay} onChange={(e) => e.target.value && setPickedDay(e.target.value)} />}
-            <label className="time-field">
-              <Icon name="clock" size={14} sw={2} />
-              <span className="sr">Time</span>
-              <input type="text" value={time} placeholder="HH:MM" onChange={(e) => setTime(e.target.value)} />
-            </label>
+            {due === "pick" && <DatePicker value={pickedDay} onChange={setPickedDay} />}
+            <TimePicker value={parseClock(time) ?? ""} onChange={setTime} />
           </div>
           <div className="field-row">
             <span className="field-label">Priority</span>
@@ -192,18 +189,13 @@ export function QuickAddModal({ initial }: { initial: ItemKind }) {
             <label htmlFor="qa-project" className="field-label">
               Project
             </label>
-            <div className="select-wrap">
-              <span aria-hidden="true" className="proj-sq" style={{ background: project?.color ?? "#9CA3AF" }} />
-              <select id="qa-project" className="proj-select" value={projectId} onChange={(e) => setProjectId(e.target.value)}>
-                <option value="">No project</option>
-                {projects.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-              <Icon name="chevron" size={14} className="chev" />
-            </div>
+            <Select
+              id="qa-project"
+              label="Project"
+              value={projectId}
+              onChange={setProjectId}
+              options={[{ value: "", label: "No project", color: "#9CA3AF" }, ...projects.map((p) => ({ value: p.id, label: p.name, color: p.color }))]}
+            />
           </div>
           <div className="field-row">
             <span className="field-label">Tag</span>

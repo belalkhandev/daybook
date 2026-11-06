@@ -50,6 +50,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             tasks::list_tasks,
+            tasks::list_upcoming,
             tasks::list_week_counts,
             tasks::get_task,
             tasks::create_task,
@@ -100,6 +101,8 @@ pub fn run() {
             shots::reveal_shot,
             capture::start_capture,
             capture::capture_info,
+            capture::overlay_ready,
+            capture::open_capture_settings,
             capture::finish_capture,
             capture::cancel_capture,
             capture::copy_shot_image,
@@ -108,5 +111,5 @@ pub fn run() {
             capture::copy_png_bytes,
         ])
         .run(tauri::generate_context!())
-        .expect("error while running Daybook");
+        .expect("error while running Trove");
 }

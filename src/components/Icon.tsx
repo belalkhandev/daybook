@@ -22,6 +22,7 @@ const DEFS: Record<string, Def> = {
     extra: <rect x="6" y="9.5" width="8.5" height="8.5" rx="1.5" />,
     sw: 2,
   },
+  calendar: { d: ["M8 3v4M16 3v4M4 10h16"], extra: <rect x="4" y="5" width="16" height="15" rx="3" />, sw: 2 },
   close: { d: ["M8 8l8 8M16 8l-8 8"], sw: 2 },
   check: { d: ["M5 12.5l4.5 4.5L19 7.5"], sw: 2.6 },
   clock: { d: ["M12 8v4l2.5 2"], extra: <circle cx="12" cy="12" r="8" />, sw: 2 },

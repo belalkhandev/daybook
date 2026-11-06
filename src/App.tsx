@@ -5,22 +5,24 @@ import TaskApp from "./views/TaskApp";
 import { Blobs } from "./components/Blobs";
 import { TopBar } from "./components/TopBar";
 import { call, onDataChanged, onEvent } from "./lib/ipc";
-import type { View } from "./lib/store";
+import type { SettingsTab, View } from "./lib/store";
 import { applyAppearance, useUI } from "./lib/store";
 import { AiModal } from "./views/AiModal";
-import { ComingSoon } from "./views/ComingSoon";
+import { Calendar } from "./views/Calendar";
 import { Notes } from "./views/Notes";
 import { Shots } from "./views/Shots";
 import { QuickAddModal } from "./views/QuickAddModal";
 import { SearchModal } from "./views/SearchModal";
 import { SettingsView } from "./views/SettingsView";
 import { Today } from "./views/Today";
+import { Upcoming } from "./views/Upcoming";
 
 export default function App() {
   const view = useUI((s) => s.view);
   const modal = useUI((s) => s.modal);
   const settings = useUI((s) => s.settings);
   const [loaded, setLoaded] = useState(false);
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
     const ui = useUI.getState();
@@ -43,9 +45,16 @@ export default function App() {
       s.requestAttach(id);
       s.go("shots");
     });
+    const offSettings = onEvent<string>("go-settings", (tab) => useUI.getState().openSettings(tab as SettingsTab));
+    const offError = onEvent<string>("capture-error", (m) => {
+      setNotice(m);
+      setTimeout(() => setNotice(""), 5000);
+    });
     return () => {
       offView();
       offAttach();
+      offSettings();
+      offError();
     };
   }, []);
 
@@ -82,8 +91,8 @@ export default function App() {
   return (
     <div className="app">
       <Blobs variant={blobs} />
+      <TopBar />
       <div className="page">
-        <TopBar />
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={view}
@@ -96,12 +105,17 @@ export default function App() {
             {loaded && view === "today" && <Today />}
             {loaded && view === "notes" && <Notes />}
             {loaded && view === "shots" && <Shots />}
-            {view === "upcoming" && <ComingSoon title="Upcoming" />}
-            {view === "calendar" && <ComingSoon title="Calendar" />}
+            {loaded && view === "upcoming" && <Upcoming />}
+            {loaded && view === "calendar" && <Calendar />}
             {loaded && view === "settings" && <SettingsView />}
           </motion.div>
         </AnimatePresence>
       </div>
+      {notice && (
+        <div role="alert" className="notice">
+          {notice}
+        </div>
+      )}
       <AnimatePresence>
         {modal?.type === "quick" && <QuickAddModal key={"q" + modal.kind} initial={modal.kind} />}
         {modal?.type === "ai" && <AiModal key={"a" + modal.kind} initial={modal.kind} />}

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Blobs } from "../components/Blobs";
 import { Icon } from "../components/Icon";
+import { DatePicker, TimePicker } from "../components/Picker";
+import { Select } from "../components/Select";
 import { Markdown } from "../components/Markdown";
 import { WindowControls } from "../components/TopBar";
 import { applyFormat, type FormatKind } from "../lib/format";
@@ -93,25 +95,10 @@ function Properties({ task, patch }: { task: Task; patch: (p: TaskPatch) => void
         {pop === "due" && (
           <Popover onClose={close} width={250}>
             <div className="pop-form">
-              <label className="mono-label" htmlFor="due-day">
-                Date
-              </label>
-              <input id="due-day" type="date" className="input-sm" value={dueDay} onChange={(e) => e.target.value && patch({ due_at: localIso(e.target.value, parseClock(dueTime)) })} />
-              <label className="mono-label" htmlFor="due-time">
-                Time
-              </label>
-              <input
-                id="due-time"
-                type="text"
-                className="input-sm"
-                placeholder="HH:MM"
-                defaultValue={dueTime}
-                onBlur={(e) => {
-                  const c = parseClock(e.target.value);
-                  patch({ due_at: localIso(dueDay, e.target.value.trim() === "" ? null : c) });
-                }}
-                onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
-              />
+              <span className="mono-label">Date</span>
+              <DatePicker id="due-day" value={dueDay} onChange={(d) => patch({ due_at: localIso(d, parseClock(dueTime)) })} />
+              <span className="mono-label">Time</span>
+              <TimePicker id="due-time" value={dueTime} onChange={(t) => patch({ due_at: localIso(dueDay, t ? parseClock(t) : null) })} />
               <button type="button" className="popover-item" onClick={() => (patch({ due_at: null }), close())}>
                 Clear date
               </button>
@@ -483,7 +470,7 @@ export default function TaskApp({ id, onClose }: { id: string; onClose?: () => v
   useEffect(() => {
     if (!onClose) return;
     const onEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !document.querySelector(".popover")) onClose();
+      if (e.key === "Escape" && !document.querySelector(".popover, .csel-menu, [data-picker-popup]")) onClose();
     };
     window.addEventListener("keydown", onEsc);
     return () => window.removeEventListener("keydown", onEsc);
@@ -509,7 +496,6 @@ export default function TaskApp({ id, onClose }: { id: string; onClose?: () => v
   const pct = target ? Math.min(100, Math.round((elapsed / target) * 100)) : 0;
   const over = target > 0 && left <= 0;
   const barColor = over ? "#EA580C" : "var(--accent)";
-  const project = projects.find((p) => p.id === task.project_id);
 
   const send = async () => {
     const body = draft.trim();
@@ -555,38 +541,26 @@ export default function TaskApp({ id, onClose }: { id: string; onClose?: () => v
 
         <section aria-labelledby="task-title" style={{ display: "flex", flexDirection: "column", gap: 18, padding: "0 4px" }}>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
-            <div className="select-wrap">
-              <span aria-hidden="true" className="sel-dot sq-lg" style={{ background: project?.color ?? "#9CA3AF" }} />
-              <label htmlFor="tw-project" className="sr">
-                Project
-              </label>
-              <select id="tw-project" className="glass-pill sel-pill" value={task.project_id ?? ""} onChange={(e) => patch({ project_id: e.target.value || null })}>
-                <option value="">No project</option>
-                {projects.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-              <Icon name="chevron" size={13} className="chev" />
-            </div>
-            <div className="select-wrap">
-              <span aria-hidden="true" className="sel-dot" style={{ background: STATUS_DOT[task.status] }} />
-              <label htmlFor="tw-status" className="sr">
-                Status
-              </label>
-              <select
-                id="tw-status"
-                className="glass-pill sel-pill"
-                value={task.status}
-                onChange={(e) => void call("set_task_status", { id, status: e.target.value })}
-              >
-                <option value="todo">To do</option>
-                <option value="progress">In progress</option>
-                <option value="done">Done</option>
-              </select>
-              <Icon name="chevron" size={13} className="chev" />
-            </div>
+            <Select
+              id="tw-project"
+              label="Project"
+              variant="pill"
+              value={task.project_id ?? ""}
+              onChange={(v) => patch({ project_id: v || null })}
+              options={[{ value: "", label: "No project", color: "#9CA3AF" }, ...projects.map((p) => ({ value: p.id, label: p.name, color: p.color }))]}
+            />
+            <Select
+              id="tw-status"
+              label="Status"
+              variant="pill"
+              value={task.status}
+              onChange={(v) => void call("set_task_status", { id, status: v })}
+              options={[
+                { value: "todo", label: "To do", color: STATUS_DOT.todo, round: true },
+                { value: "progress", label: "In progress", color: STATUS_DOT.progress, round: true },
+                { value: "done", label: "Done", color: STATUS_DOT.done, round: true },
+              ]}
+            />
           </div>
           <input
             id="task-title"

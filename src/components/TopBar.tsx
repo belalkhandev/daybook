@@ -48,7 +48,7 @@ export function TopBar() {
       <div className="brand" data-tauri-drag-region>
         <div className="brand-mark" aria-hidden="true" data-tauri-drag-region />
         <span className="brand-name" data-tauri-drag-region>
-          Daybook
+          Trove
         </span>
       </div>
       <nav className="nav" aria-label="Views">

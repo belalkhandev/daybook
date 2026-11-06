@@ -1,3 +1,4 @@
+import { Select } from "../components/Select";
 import { useState } from "react";
 import { Icon } from "../components/Icon";
 import { Switch } from "../components/Switch";
@@ -8,6 +9,7 @@ type Conn = "idle" | "testing" | "ok" | "fail";
 
 const TABS: { key: SettingsTab; label: string }[] = [
   { key: "general", label: "General" },
+  { key: "shots", label: "Screenshots" },
   { key: "ai", label: "AI assistant" },
   { key: "sync", label: "Sync & backup" },
   { key: "shortcuts", label: "Shortcuts" },
@@ -83,6 +85,53 @@ function General() {
           <span style={{ fontSize: 13, color: "var(--muted)" }}>Use solid cards instead of blurred glass. Helps on slower GPUs.</span>
         </div>
         <Switch on={reduce} onChange={(v) => void setSetting("reduce_transparency", v ? "1" : "0")} labelledBy="reduce-label" />
+      </div>
+    </section>
+  );
+}
+
+const DELAYS = [
+  { value: "0", label: "No delay" },
+  { value: "3", label: "3 seconds" },
+  { value: "5", label: "5 seconds" },
+  { value: "10", label: "10 seconds" },
+];
+
+const SHOT_TOGGLES = [
+  { key: "shots.copy", title: "Copy to clipboard", desc: "Put every new screenshot on the clipboard as soon as it is taken.", on: true },
+  { key: "shots.edit", title: "Open the editor after capture", desc: "Jump straight into annotating instead of showing the small preview.", on: false },
+  { key: "shots.ocr", title: "Read text in screenshots", desc: "Run text recognition in the background so you can search inside images. Needs Tesseract.", on: true },
+  { key: "shots.remember", title: "Remember my last area", desc: "Start the next area capture with the area you used last time. Off means the whole screen is selected first.", on: false },
+];
+
+function ShotSettings() {
+  const settings = useUI((s) => s.settings);
+  const setSetting = useUI((s) => s.setSetting);
+  const flag = (key: string, def: boolean) => (settings[key] === undefined ? def : settings[key] === "1");
+  return (
+    <section aria-labelledby="shots-h" className="glass settings-card">
+      <h2 id="shots-h" style={{ fontSize: 18, fontWeight: 600 }}>
+        Screenshots
+      </h2>
+      {SHOT_TOGGLES.map((t) => (
+        <div key={t.key} className="toggle-row">
+          <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+            <span id={`${t.key}-label`} style={{ fontWeight: 500 }}>
+              {t.title}
+            </span>
+            <span style={{ fontSize: 13, color: "var(--muted)" }}>{t.desc}</span>
+          </div>
+          <Switch on={flag(t.key, t.on)} onChange={(v) => void setSetting(t.key, v ? "1" : "0")} labelledBy={`${t.key}-label`} />
+        </div>
+      ))}
+      <div className="toggle-row">
+        <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          <span id="shots-delay-label" style={{ fontWeight: 500 }}>
+            Capture delay
+          </span>
+          <span style={{ fontSize: 13, color: "var(--muted)" }}>Wait this long after you press Capture, so you can open a menu or tooltip first.</span>
+        </div>
+        <Select id="shots-delay" label="Capture delay" value={settings["shots.delay"] || "0"} onChange={(v) => void setSetting("shots.delay", v)} options={DELAYS} />
       </div>
     </section>
   );
@@ -164,7 +213,7 @@ function AiSettings() {
             <h2 id="conn-h" style={{ fontSize: 18, fontWeight: 600 }}>
               Connection
             </h2>
-            <span style={{ fontSize: 13, color: "var(--muted)" }}>Use your own API key. Daybook calls the API directly from this computer.</span>
+            <span style={{ fontSize: 13, color: "var(--muted)" }}>Use your own API key. Trove calls the API directly from this computer.</span>
           </div>
           <span className="status-pill" style={{ background: status.bg, color: status.color }}>
             <span aria-hidden="true" style={{ width: 7, height: 7, borderRadius: "50%", background: status.dot }} />
@@ -275,14 +324,18 @@ function AiSettings() {
           <label htmlFor="out-lang" className="mono-label">
             Output language
           </label>
-          <div className="select-wrap">
-            <select id="out-lang" className="lang-select" value={language} onChange={(e) => setLanguage(e.target.value)}>
-              <option value="same">Same as my input</option>
-              <option value="english">English</option>
-              <option value="bangla">{"বাংলা (Bangla)"}</option>
-            </select>
-            <Icon name="chevron" size={15} className="chev" />
-          </div>
+          <Select
+            id="out-lang"
+            label="Output language"
+            variant="wide"
+            value={language}
+            onChange={setLanguage}
+            options={[
+              { value: "same", label: "Same as my input" },
+              { value: "english", label: "English" },
+              { value: "bangla", label: "বাংলা (Bangla)" },
+            ]}
+          />
         </div>
       </section>
 
@@ -322,6 +375,7 @@ export function SettingsView() {
         </nav>
       </div>
       {tab === "general" && <General />}
+      {tab === "shots" && <ShotSettings />}
       {tab === "ai" && <AiSettings />}
       {(tab === "sync" || tab === "shortcuts") && (
         <section className="glass settings-card">

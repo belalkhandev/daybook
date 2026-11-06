@@ -92,7 +92,7 @@ CREATE INDEX idx_shots_taken ON shots(taken_at DESC);
 ";
 
 const DEFAULT_PROJECTS: [(&str, &str); 4] = [
-    ("Daybook App", "#6366F1"),
+    ("Trove App", "#6366F1"),
     ("Client work", "#F59E0B"),
     ("Website", "#EC4899"),
     ("Personal", "#10B981"),
@@ -107,8 +107,21 @@ impl Db {
 
     pub fn open() -> AppResult<Self> {
         let dir = data_dir();
+        let moved = migrate_legacy(&dir);
         std::fs::create_dir_all(&dir).map_err(|e| AppError::Other(e.to_string()))?;
-        Self::init(Connection::open(dir.join("daybook.db"))?)
+        let db = Self::init(Connection::open(dir.join("trove.db"))?)?;
+        if let Some((old_pictures, new_pictures)) = moved {
+            db.conn().execute(
+                "UPDATE shots SET file = replace(file, ?1, ?2), thumb = replace(thumb, ?3, ?4)",
+                params![
+                    old_pictures,
+                    new_pictures,
+                    dir.with_file_name("daybook").to_string_lossy().to_string(),
+                    dir.to_string_lossy().to_string()
+                ],
+            )?;
+        }
+        Ok(db)
     }
 
     #[cfg(test)]
@@ -148,7 +161,28 @@ fn seed(conn: &Connection) -> AppResult<()> {
 pub fn data_dir() -> PathBuf {
     dirs::data_dir()
         .unwrap_or_else(|| PathBuf::from("."))
-        .join("daybook")
+        .join("trove")
+}
+
+fn migrate_legacy(dir: &std::path::Path) -> Option<(String, String)> {
+    let old = dir.with_file_name("daybook");
+    if dir.exists() || !old.exists() {
+        return None;
+    }
+    std::fs::rename(&old, dir).ok()?;
+    for suffix in ["", "-wal", "-shm"] {
+        let from = dir.join(format!("daybook.db{suffix}"));
+        if from.exists() {
+            let _ = std::fs::rename(&from, dir.join(format!("trove.db{suffix}")));
+        }
+    }
+    let pictures = dirs::picture_dir().or_else(|| dirs::home_dir().map(|h| h.join("Pictures")))?;
+    let old_pictures = pictures.join("Daybook");
+    let new_pictures = pictures.join("Trove");
+    if old_pictures.exists() && !new_pictures.exists() {
+        std::fs::rename(&old_pictures, &new_pictures).ok()?;
+    }
+    Some((old_pictures.to_string_lossy().to_string(), new_pictures.to_string_lossy().to_string()))
 }
 
 pub fn new_id() -> String {

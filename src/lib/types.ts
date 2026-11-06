@@ -150,11 +150,23 @@ export interface ShotPatch {
   note_id?: string | null;
 }
 
+export interface CaptureRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 export interface CaptureInfo {
   width: number;
   height: number;
   mode: string;
   src: string;
+  monitor: CaptureRect;
+  index: number;
+  count: number;
+  primary: number;
+  remembered: CaptureRect | null;
 }
 
 export type CaptureMode = "area" | "window" | "screen";

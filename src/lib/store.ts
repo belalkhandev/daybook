@@ -4,7 +4,7 @@ import type { ItemKind, Project, Settings } from "./types";
 import { dayKey, hexToRgb } from "./util";
 
 export type View = "today" | "upcoming" | "notes" | "shots" | "calendar" | "settings";
-export type SettingsTab = "general" | "ai" | "sync" | "shortcuts";
+export type SettingsTab = "general" | "shots" | "ai" | "sync" | "shortcuts";
 export type Modal =
   | null
   | { type: "quick"; kind: ItemKind }

@@ -1,0 +1,149 @@
+.cal-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cal-today {
+  min-height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--sh-nav);
+}
+
+.cal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 24px;
+}
+
+.cal-dow {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  padding: 0 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.cal-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  min-height: 104px;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--ink);
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+
+.cal-cell:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+.cal-cell.is-out {
+  opacity: 0.45;
+}
+
+.cal-cell.is-sel {
+  background: #fff;
+  border-color: var(--accent);
+}
+
+.cal-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cal-cell.is-today .cal-num {
+  background: var(--accent);
+  color: #fff;
+}
+
+.cal-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.cal-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 11.5px;
+  color: var(--text-3b);
+}
+
+.cal-chip.is-done {
+  text-decoration: line-through;
+  color: var(--faint);
+}
+
+.cal-chip-t {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cal-more {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.cal-day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cal-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}

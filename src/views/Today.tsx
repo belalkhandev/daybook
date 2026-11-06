@@ -46,7 +46,7 @@ function TaskMenu({ task, onClose }: { task: Task; onClose: () => void }) {
   );
 }
 
-function TaskRow({ task, onToggle, index }: { task: Task; onToggle: (t: Task) => void; index: number }) {
+export function TaskRow({ task, onToggle, index }: { task: Task; onToggle: (t: Task) => void; index: number }) {
   const [menu, setMenu] = useState(false);
   const done = task.status === "done";
   const pr = PRIORITY[task.priority];
@@ -363,7 +363,7 @@ export function Today() {
       </div>
 
       <footer className="foot">
-        <span>Stored locally · ~/.local/share/daybook</span>
+        <span>Stored locally · ~/.local/share/trove</span>
         <span>Last saved {savedAt}</span>
       </footer>
     </>

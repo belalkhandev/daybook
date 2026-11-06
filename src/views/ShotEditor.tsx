@@ -1,13 +1,17 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Blobs } from "../components/Blobs";
+import { ColorPicker } from "../components/ColorPicker";
 import { Icon } from "../components/Icon";
 import {
   bounds,
   cropBase,
   cropPreset,
   hit,
+  newCrop,
   render,
+  renderView,
   resizeBase,
+  resizeCrop,
   scaleMark,
   translate,
   type Box,
@@ -33,10 +37,16 @@ const TOOLS: { key: Tool; label: string; k: string; d: string; gap?: boolean }[]
 
 const DRAW: Tool[] = ["pen", "highlight", "arrow", "rect", "text", "blur"];
 const COLORS = [
+  { name: "Red", hex: "#EF4444" },
   { name: "Orange", hex: "#EA580C" },
-  { name: "Indigo", hex: "#6366F1" },
-  { name: "Green", hex: "#10B981" },
   { name: "Yellow", hex: "#FCD34D" },
+  { name: "Green", hex: "#10B981" },
+  { name: "Teal", hex: "#14B8A6" },
+  { name: "Blue", hex: "#3B82F6" },
+  { name: "Indigo", hex: "#6366F1" },
+  { name: "Purple", hex: "#A855F7" },
+  { name: "Pink", hex: "#EC4899" },
+  { name: "Gray", hex: "#6B7280" },
   { name: "Black", hex: "#16161D" },
   { name: "White", hex: "#FFFFFF" },
 ];
@@ -44,6 +54,7 @@ const SIZES = [
   { name: "Thin", dot: 6 },
   { name: "Medium", dot: 10 },
   { name: "Thick", dot: 15 },
+  { name: "Heavy", dot: 20 },
 ];
 const ASPECTS = ["free", "16:9", "4:3", "1:1"];
 const SCALES = [25, 50, 75, 100];
@@ -91,7 +102,8 @@ export function ShotEditor({ id }: { id: string }) {
   const [tool, setTool] = useState<Tool>("arrow");
   const [color, setColor] = useState("#EA580C");
   const [size, setSize] = useState(1);
-  const [zoom, setZoom] = useState(100);
+  const [zoomSel, setZoomSel] = useState<number | null>(null);
+  const [stageSize, setStageSize] = useState({ w: 0, h: 0 });
   const [aspect, setAspect] = useState("free");
   const [crop, setCrop] = useState<Box | null>(null);
   const [rw, setRw] = useState("");
@@ -105,6 +117,8 @@ export function ShotEditor({ id }: { id: string }) {
   const [error, setError] = useState("");
   const canvas = useRef<HTMLCanvasElement>(null);
   const surface = useRef<HTMLDivElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  const wrap = useRef<HTMLDivElement>(null);
   const drag = useRef<Drag | null>(null);
   const edited = useRef(false);
 
@@ -121,6 +135,11 @@ export function ShotEditor({ id }: { id: string }) {
   const marks = live ?? cur?.marks ?? [];
   const iw = cur?.base.width ?? 1;
   const ih = cur?.base.height ?? 1;
+  const dpr = window.devicePixelRatio || 1;
+  const fitScale = stageSize.w > 0 ? Math.max(0.02, Math.min(1, (stageSize.w - 32) / iw, (stageSize.h - 32) / ih)) : 1;
+  const scale = zoomSel ?? fitScale;
+  const dw = Math.max(1, Math.round(iw * scale));
+  const dh = Math.max(1, Math.round(ih * scale));
 
   const commit = useCallback(
     (snap: Snapshot) => {
@@ -136,11 +155,67 @@ export function ShotEditor({ id }: { id: string }) {
   useEffect(() => {
     const c = canvas.current;
     if (!c || !cur) return;
-    c.width = cur.base.width;
-    c.height = cur.base.height;
+    c.width = Math.max(1, Math.round(dw * dpr));
+    c.height = Math.max(1, Math.round(dh * dpr));
     const ctx = c.getContext("2d");
-    if (ctx) render(ctx, { base: cur.base, marks }, draft ? [draft] : []);
-  }, [cur, marks, draft]);
+    if (ctx) renderView(ctx, { base: cur.base, marks }, draft ? [draft] : [], c.width / cur.base.width);
+  }, [cur, marks, draft, dw, dh, dpr]);
+
+  useEffect(() => {
+    const el = stage.current;
+    if (!el) return;
+    const measure = () => setStageSize({ w: el.clientWidth, h: el.clientHeight });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [cur !== undefined]);
+
+  const zoomBy = useCallback(
+    (dir: 1 | -1) =>
+      setZoomSel(() => {
+        const steps = [0.1, 0.25, 0.33, 0.5, 0.67, 0.75, 1, 1.5, 2, 3, 4, 6, 8];
+        if (dir > 0) return steps.find((x) => x > scale * 1.01) ?? 8;
+        return [...steps].reverse().find((x) => x < scale * 0.99) ?? 0.1;
+      }),
+    [scale],
+  );
+  const zoomRef = useRef(zoomBy);
+  zoomRef.current = zoomBy;
+
+  const scaleRef = useRef(scale);
+  scaleRef.current = scale;
+  const anchor = useRef<{ fx: number; fy: number; mx: number; my: number } | null>(null);
+
+  useEffect(() => {
+    const el = stage.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      const w = wrap.current;
+      if (!w) return;
+      e.preventDefault();
+      const r = w.getBoundingClientRect();
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      anchor.current = inside
+        ? { fx: (e.clientX - r.left) / r.width, fy: (e.clientY - r.top) / r.height, mx: e.clientX, my: e.clientY }
+        : { fx: 0.5, fy: 0.5, mx: r.left + r.width / 2, my: r.top + r.height / 2 };
+      const next = scaleRef.current * Math.exp(-e.deltaY * 0.0016);
+      setZoomSel(Math.min(8, Math.max(0.05, next)));
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [cur !== undefined]);
+
+  useLayoutEffect(() => {
+    const a = anchor.current;
+    const el = stage.current;
+    const w = wrap.current;
+    if (!a || !el || !w) return;
+    anchor.current = null;
+    const r = w.getBoundingClientRect();
+    el.scrollLeft += r.left + a.fx * r.width - a.mx;
+    el.scrollTop += r.top + a.fy * r.height - a.my;
+  }, [dw, dh]);
 
   useEffect(() => {
     if (tool === "crop" && cur) setCrop(cropPreset(aspect, cur.base.width, cur.base.height));
@@ -177,6 +252,9 @@ export function ShotEditor({ id }: { id: string }) {
         drag.current = { k: "move", id: found.id, sx: p.x, sy: p.y, orig: cur.marks };
         setLive(cur.marks);
       }
+    } else if (tool === "crop") {
+      drag.current = { k: "crop", corner: "new", orig: { x: p.x, y: p.y, w: 0, h: 0 }, sx: p.x, sy: p.y };
+      setCrop({ x: p.x, y: p.y, w: 0, h: 0 });
     } else if (tool === "text") {
       setTextAt({ x: p.x, y: p.y });
     } else if (DRAW.includes(tool)) {
@@ -192,7 +270,7 @@ export function ShotEditor({ id }: { id: string }) {
     const p = point(e);
     if (d.k === "draw") {
       const m = { ...d.mark };
-      if (m.t === "pen") m.pts = [...m.pts, [p.x, p.y]];
+      if (m.t === "pen" || m.t === "highlight") m.pts = [...m.pts, [p.x, p.y]];
       else {
         m.w = p.x - m.x;
         m.h = p.y - m.y;
@@ -227,32 +305,9 @@ export function ShotEditor({ id }: { id: string }) {
       }
       setLive(cur.marks.map((m) => (m.id === d.id ? next : m)));
     } else if (d.k === "crop") {
-      const o = d.orig;
-      const dx = p.x - d.sx;
-      const dy = p.y - d.sy;
-      let b: Box;
-      if (d.corner === "move") b = { ...o, x: Math.max(0, Math.min(iw - o.w, o.x + dx)), y: Math.max(0, Math.min(ih - o.h, o.y + dy)) };
-      else {
-        const left = d.corner.includes("l");
-        const top = d.corner.includes("t");
-        const fx = left ? o.x + o.w : o.x;
-        const fy = top ? o.y + o.h : o.y;
-        let cx = Math.max(0, Math.min(iw, left ? o.x + dx : o.x + o.w + dx));
-        let cy = Math.max(0, Math.min(ih, top ? o.y + dy : o.y + o.h + dy));
-        if (aspect !== "free") {
-          const [a, bb] = aspect.split(":").map(Number);
-          const r = a / bb;
-          const w = Math.abs(cx - fx);
-          const h = w / r;
-          cy = top ? fy - h : fy + h;
-          if (cy < 0 || cy > ih) {
-            cy = Math.max(0, Math.min(ih, cy));
-            cx = left ? fx - Math.abs(cy - fy) * r : fx + Math.abs(cy - fy) * r;
-          }
-        }
-        b = { x: Math.min(fx, cx), y: Math.min(fy, cy), w: Math.abs(cx - fx), h: Math.abs(cy - fy) };
-      }
-      setCrop(b);
+      const ratio = aspect === "free" ? null : (() => { const [a, bb] = aspect.split(":").map(Number); return a / bb; })();
+      if (d.corner === "new") setCrop(newCrop(d.sx, d.sy, p.x, p.y, ratio, iw, ih));
+      else setCrop(resizeCrop(d.orig, d.corner, p.x - d.sx, p.y - d.sy, ratio, iw, ih));
     }
   };
 
@@ -262,11 +317,11 @@ export function ShotEditor({ id }: { id: string }) {
     if (!d || !cur) return;
     if (d.k === "draw") {
       const m = d.mark;
-      const big = m.t === "pen" ? m.pts.length > 1 : Math.hypot(m.x2 - m.x, m.y2 - m.y) > 6;
+      const big = m.t === "pen" || m.t === "highlight" ? m.pts.length > 1 : Math.hypot(m.x2 - m.x, m.y2 - m.y) > 6;
       setDraft(null);
       if (big) {
         commitMarks([...cur.marks, m]);
-        if (m.t !== "pen") setSel(null);
+        if (m.t !== "pen" && m.t !== "highlight") setSel(null);
       }
     } else if ((d.k === "move" || d.k === "handle") && live) {
       commitMarks(live);
@@ -305,6 +360,7 @@ export function ShotEditor({ id }: { id: string }) {
     if (!cur || !crop || crop.w < 4 || crop.h < 4) return;
     const base = cropBase(cur.base, crop);
     commit({ base, marks: cur.marks.map((m) => translate(m, -Math.round(crop.x), -Math.round(crop.y))) });
+    setZoomSel(null);
     setTool("select");
   };
 
@@ -314,6 +370,7 @@ export function ShotEditor({ id }: { id: string }) {
     const h = parseInt(rh, 10);
     if (!(w > 0 && h > 0)) return;
     commit({ base: resizeBase(cur.base, w, h), marks: cur.marks.map((m) => scaleMark(m, w / cur.base.width, h / cur.base.height)) });
+    setZoomSel(null);
     setTool("select");
   };
 
@@ -337,8 +394,9 @@ export function ShotEditor({ id }: { id: string }) {
       const blob = await flatten();
       const bytes = new Uint8Array(await blob.arrayBuffer());
       await callRaw("save_shot_image", bytes, { "x-shot-id": id, "x-as-copy": asCopy ? "1" : "0" });
-      if (!asCopy) edited.current = false;
-      flash(asCopy ? "Saved as a copy" : "Saved");
+      edited.current = false;
+      await call("focus_main_window", { view: "shots" });
+      await win.close();
     } catch (e) {
       setError(errorMessage(e));
     }
@@ -377,6 +435,18 @@ export function ShotEditor({ id }: { id: string }) {
         e.preventDefault();
         commitMarks(cur.marks.filter((m) => m.id !== sel));
         setSel(null);
+      } else if ((e.ctrlKey || e.metaKey) && (k === "=" || k === "+")) {
+        e.preventDefault();
+        zoomBy(1);
+      } else if ((e.ctrlKey || e.metaKey) && k === "-") {
+        e.preventDefault();
+        zoomBy(-1);
+      } else if ((e.ctrlKey || e.metaKey) && k === "0") {
+        e.preventDefault();
+        setZoomSel(null);
+      } else if (k === "enter" && tool === "crop") {
+        e.preventDefault();
+        applyCrop();
       } else if (k === "escape") {
         setSel(null);
         setTextAt(null);
@@ -391,12 +461,24 @@ export function ShotEditor({ id }: { id: string }) {
   });
 
   const selMark = useMemo(() => (cur && sel !== null ? marks.find((m) => m.id === sel) ?? null : null), [cur, sel, marks]);
+  const restyle = (patch: Partial<Mark>) => {
+    if (!cur || sel === null) return;
+    commitMarks(cur.marks.map((m) => (m.id === sel && m.t !== "blur" ? { ...m, ...patch } : m)));
+  };
+  const chooseSize = (i: number) => {
+    setSize(i);
+    restyle({ size: i });
+  };
+  const chooseColor = (hex: string) => {
+    setColor(hex);
+    restyle({ color: hex });
+  };
   const pct = (v: number, total: number) => `${(v / total) * 100}%`;
   const boxStyle = (b: Box) => ({ left: pct(b.x, iw), top: pct(b.y, ih), width: pct(b.w, iw), height: pct(b.h, ih) });
   const dims = cur ? `${cur.base.width} × ${cur.base.height}` : "";
   const toolName = TOOLS.find((t) => t.key === tool)?.label ?? "";
   const pill = (on: boolean) => (on ? "opt-pill is-on" : "opt-pill");
-  const handleBox = selMark && selMark.t !== "pen" && selMark.t !== "text" ? bounds(selMark, iw) : null;
+  const handleBox = selMark && selMark.t !== "pen" && selMark.t !== "highlight" && selMark.t !== "text" ? bounds(selMark, iw) : null;
 
   return (
     <div className="app" style={{ minHeight: "100vh" }}>
@@ -427,12 +509,17 @@ export function ShotEditor({ id }: { id: string }) {
               </button>
             </div>
             <div className="ed-group">
-              <button type="button" aria-label="Zoom out" style={{ fontSize: 18 }} onClick={() => setZoom((z) => Math.max(50, z - 10))}>
+              <button type="button" aria-label="Zoom out" title="Zoom out (Ctrl -)" style={{ fontSize: 18 }} onClick={() => zoomBy(-1)}>
                 {"−"}
               </button>
-              <span className="zoom-label">{zoom}%</span>
-              <button type="button" aria-label="Zoom in" style={{ fontSize: 18 }} onClick={() => setZoom((z) => Math.min(150, z + 10))}>
+              <button type="button" className="zoom-label" title="Actual size (100%)" onClick={() => setZoomSel(1)}>
+                {Math.round(scale * 100)}%
+              </button>
+              <button type="button" aria-label="Zoom in" title="Zoom in (Ctrl +)" style={{ fontSize: 18 }} onClick={() => zoomBy(1)}>
                 +
+              </button>
+              <button type="button" className={`zoom-fit${zoomSel === null ? " is-on" : ""}`} title="Fit to window (Ctrl 0)" onClick={() => setZoomSel(null)}>
+                Fit
               </button>
             </div>
           </div>
@@ -455,8 +542,8 @@ export function ShotEditor({ id }: { id: string }) {
 
         {error && <div className="error-banner">{error}</div>}
 
-        <div className="ed-stage">
-          <div className="ed-canvas-wrap" style={{ width: `${Math.round((1000 * zoom) / 100)}px`, aspectRatio: `${iw} / ${ih}` }}>
+        <div className="ed-stage" ref={stage}>
+          <div className="ed-canvas-wrap" ref={wrap} style={{ width: dw, height: dh }}>
             <canvas ref={canvas} role="img" aria-label="Screenshot being edited" style={{ display: "block", width: "100%", height: "100%" }} />
             <div
               ref={surface}
@@ -477,16 +564,22 @@ export function ShotEditor({ id }: { id: string }) {
                   )}
                 </div>
               )}
-              {selMark && (selMark.t === "pen" || selMark.t === "text") && <div className="sel-box" style={boxStyle(bounds(selMark, iw))} />}
+              {selMark && (selMark.t === "pen" || selMark.t === "highlight" || selMark.t === "text") && <div className="sel-box" style={boxStyle(bounds(selMark, iw))} />}
               {tool === "crop" && crop && (
-                <div className="crop-box" style={boxStyle(crop)} onPointerDown={(e) => startCrop(e, "move")}>
+                <div className="crop-box" style={boxStyle(crop)} onPointerDown={(e) => startCrop(e, "move")} onDoubleClick={applyCrop}>
                   <span className="g v1" />
                   <span className="g v2" />
                   <span className="g h1" />
                   <span className="g h2" />
+                  {(["t", "b", "l", "r"] as const).map((c) => (
+                    <span key={c} className={`crop-e ${c}`} onPointerDown={(e) => startCrop(e, c)} />
+                  ))}
                   {(["tl", "tr", "bl", "br"] as const).map((c) => (
                     <span key={c} className={`crop-c ${c}`} onPointerDown={(e) => startCrop(e, c)} />
                   ))}
+                  <span className="crop-size">
+                    {Math.round(crop.w)} {"×"} {Math.round(crop.h)}
+                  </span>
                 </div>
               )}
               {textAt && (
@@ -580,7 +673,7 @@ export function ShotEditor({ id }: { id: string }) {
                 </button>
               </>
             )}
-            {DRAW.includes(tool) && (
+            {(DRAW.includes(tool) || (tool === "select" && selMark && selMark.t !== "blur")) && (
               <>
                 <div role="group" aria-label="Colour" style={{ display: "flex", gap: 6 }}>
                   {COLORS.map((c) => (
@@ -591,14 +684,15 @@ export function ShotEditor({ id }: { id: string }) {
                       aria-pressed={color === c.hex}
                       className="color-dot"
                       style={{ background: c.hex, boxShadow: color === c.hex ? "0 0 0 2px #16161D" : "0 0 0 1px rgba(22,22,29,0.18)" }}
-                      onClick={() => setColor(c.hex)}
+                      onClick={() => chooseColor(c.hex)}
                     />
                   ))}
+                  <ColorPicker value={color} active={!COLORS.some((c) => c.hex === color)} onChange={chooseColor} />
                 </div>
                 <div className="opt-div" aria-hidden="true" />
                 <div role="group" aria-label="Size" style={{ display: "flex", gap: 4 }}>
                   {SIZES.map((z, i) => (
-                    <button key={z.name} type="button" aria-label={z.name} aria-pressed={size === i} className={`size-btn${size === i ? " is-on" : ""}`} onClick={() => setSize(i)}>
+                    <button key={z.name} type="button" aria-label={z.name} aria-pressed={size === i} className={`size-btn${size === i ? " is-on" : ""}`} onClick={() => chooseSize(i)}>
                       <span aria-hidden="true" style={{ borderRadius: "50%", background: "currentColor", width: z.dot, height: z.dot }} />
                     </button>
                   ))}

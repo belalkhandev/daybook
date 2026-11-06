@@ -6,7 +6,13 @@ use tauri::{AppHandle, State};
 use crate::db::{changed, Db};
 use crate::error::{AppError, AppResult};
 
-const KEYS: [&str; 8] = [
+const KEYS: [&str; 14] = [
+    "shots.copy",
+    "shots.edit",
+    "shots.ocr",
+    "shots.delay",
+    "shots.remember",
+    "shots.area",
     "accent",
     "reduce_transparency",
     "ai.provider",
@@ -17,7 +23,8 @@ const KEYS: [&str; 8] = [
     "ai.language",
 ];
 
-const KEYRING_SERVICE: &str = "daybook";
+const KEYRING_SERVICE: &str = "trove";
+const LEGACY_KEYRING_SERVICE: &str = "daybook";
 const KEYRING_USER: &str = "ai-api-key";
 
 pub fn all(conn: &rusqlite::Connection) -> AppResult<HashMap<String, String>> {
@@ -33,13 +40,24 @@ pub fn all(conn: &rusqlite::Connection) -> AppResult<HashMap<String, String>> {
     Ok(map)
 }
 
+pub fn get(conn: &rusqlite::Connection, key: &str) -> Option<String> {
+    conn.query_row("SELECT value FROM settings WHERE key = ?1", params![key], |r| r.get(0)).ok()
+}
+
 pub fn api_key() -> AppResult<Option<String>> {
     let entry = keyring::Entry::new(KEYRING_SERVICE, KEYRING_USER).map_err(|e| AppError::Other(e.to_string()))?;
     match entry.get_password() {
         Ok(k) if !k.is_empty() => Ok(Some(k)),
-        Ok(_) | Err(keyring::Error::NoEntry) => Ok(None),
+        Ok(_) | Err(keyring::Error::NoEntry) => Ok(legacy_key(&entry)),
         Err(e) => Err(AppError::Other(e.to_string())),
     }
+}
+
+fn legacy_key(entry: &keyring::Entry) -> Option<String> {
+    let old = keyring::Entry::new(LEGACY_KEYRING_SERVICE, KEYRING_USER).ok()?;
+    let key = old.get_password().ok().filter(|k| !k.is_empty())?;
+    let _ = entry.set_password(&key);
+    Some(key)
 }
 
 #[tauri::command]
